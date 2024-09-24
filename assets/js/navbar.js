@@ -1,17 +1,14 @@
-// navbar.js
-
-// Function to insert the navigation bar into the HTML page
 function loadNavBar() {
   const navContent = `
     <figure>
       <img src="./assets/images/index/logo.png" alt="logo" />
     </figure>
     <div class="navContent">
-      <div class="navItems" id="dashboard-link">
+      <div class="navItems" id="dashboard_link">
         <i class="bi bi-house-door" style="font-size: 20px"></i>
         <p>Dashboard</p>
       </div>
-      <div class="navItems" id="customer-management-link">
+      <div class="navItems" id="mesha_customer_management_link">
         <i class="bi bi-person-workspace" style="font-size: 20px"></i>
         <p>Mesha Customer Management</p>
       </div>
@@ -52,7 +49,7 @@ function loadNavBar() {
           </div>
         </div>
       </div>
-      <div class="navItems" id="customer-management-link">
+      <div class="navItems" id="customer_management_link">
         <i class="bi bi-people" style="font-size: 20px"></i>
         <p>Customer Management</p>
       </div>
@@ -81,26 +78,28 @@ function loadNavBar() {
 
   document.getElementById("nav").innerHTML = navContent;
 
-  // Call the function to set the active class based on the current path
   setActiveLink();
 
-  // Add click event listener for Dashboard link
   document
-    .getElementById("dashboard-link")
+    .getElementById("dashboard_link")
     .addEventListener("click", function () {
-      // Navigate to the /index.html path
       window.location.href = "/index.html";
+    });
+  document
+    .getElementById("mesha_customer_management_link")
+    .addEventListener("click", function () {
+      window.location.href = "/mesha_customer_management.html";
     });
 }
 
-// Function to set the active class based on the current path
 function setActiveLink() {
   const path = window.location.pathname;
 
   const links = {
-    "/": "dashboard-link",
-    "/index.html": "dashboard-link",
-    "/customer-management": "customer-management-link",
+    "/": "dashboard_link",
+    "/index.html": "dashboard_link",
+    "/mesha_customer_management.html": "mesha_customer_management_link",
+    "/customer-management": "customer_management_link",
     "/device-management-1": "device-management-1-link",
     "/device-management-2": "device-management-2-link",
     "/map-view": "map-view-link",
@@ -109,17 +108,14 @@ function setActiveLink() {
     "/faqs": "faqs-link",
   };
 
-  // Remove 'active' class from all navItems
   const navItems = document.querySelectorAll(".navItems");
   navItems.forEach((item) => {
     item.classList.remove("active");
   });
 
-  // Set the active class for the matching link
   if (links[path]) {
     document.getElementById(links[path]).classList.add("active");
   }
 }
 
-// Call the function to load the nav bar when the DOM is fully loaded
 document.addEventListener("DOMContentLoaded", loadNavBar);
