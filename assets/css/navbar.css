@@ -1,0 +1,106 @@
+body {
+  margin: 0;
+  padding: 0;
+}
+#nav {
+  border: 1px solid black;
+  width: 16%;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: scroll;
+  scrollbar-width: none;
+}
+figure {
+  margin: 0;
+  padding: 0;
+}
+figure img {
+  width: 100%;
+}
+.navContent {
+  border-right: 1px solid lightblue;
+}
+.navItems {
+  padding: 10px 24px;
+  /* border-top: 1px solid lightgray; */
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+.navItems p {
+  margin-bottom: -5px;
+  color: #626c70;
+}
+.navItems.active {
+  background-color: #ecfff6;
+  color: #0d5e36;
+  border-left: 6px solid #0d5e36;
+}
+.navItems i {
+  color: #626c70;
+}
+.navItems.active i {
+  color: #0d5e36;
+  font-weight: bold;
+}
+.navItems.active p {
+  font-weight: bold;
+  color: #0d5e36;
+}
+
+/* Accordion Styles */
+#accordionExample {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+.accordion-item {
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  border: 0 !important;
+  box-shadow: 0 !important;
+}
+.accordion-header {
+  border-radius: 0 !important;
+}
+#flush-collapseOne {
+  border: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: 0 !important;
+}
+.accordion-button {
+  color: #626c70 !important;
+  background-color: white !important;
+  transition: background-color 0.3s ease !important;
+  border-radius: 0 !important;
+  box-shadow: 0 !important;
+  padding-left: 24px !important;
+}
+
+.accordion-button:not(.collapsed) {
+  color: #0d5e36 !important;
+  background-color: #ecfff6 !important;
+  border-left: 6px solid #0d5e36 !important;
+  border-radius: 0 !important;
+  padding-left: 24px !important;
+  /* border: 1px solid #0d5e36 !important; */
+}
+.accordion-button:not(.collapsed) p,
+.accordion-button p {
+  margin-bottom: 0 !important;
+  margin-left: 10px;
+}
+
+.accordion-button:focus {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.accordion-collapse {
+  border: 1px solid lightgray !important;
+  border-top: none !important;
+}
