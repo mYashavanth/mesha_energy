@@ -90,15 +90,26 @@ const gridOptions = {
     {
       headerName: "Status",
       field: "status",
+      filter: false,
+      sortable: false,
       cellRenderer: StatusCellRenderer, // Use custom renderer
     },
     {
       headerName: "Action",
       field: "action",
+      filter: false,
+      sortable: false,
       cellRenderer: function (params) {
-        return `<button type="button" class="btn btn-light" onclick="console.log('Edit button clicked')">
-              <i class="bi bi-pencil-square"></i>
-            </button>`;
+        return `<button 
+                  type="button" 
+                  style="margin-top:10px;" 
+                  data-bs-toggle="modal"
+                  data-bs-target="#staticBackdrop"
+                  class="btn btn-light" 
+                  onclick='handleEdit(${JSON.stringify(params.data)})'
+                >
+                  <i class="bi bi-pencil-square"></i>
+                </button>`;
       },
     },
   ],
@@ -117,8 +128,15 @@ const gridOptions = {
   pagination: true,
   paginationPageSize: 5,
   paginationPageSizeSelector: [5, 10, 15],
+  suppressExcelExport: true,
 };
+function handleEdit(rowData) {
+  console.log("Edit button clicked for:", rowData);
+}
 
+function onBtnExport() {
+  gridApi.exportDataAsCsv();
+}
 // Toggle status function to handle changes
 function toggleStatus(rowId, newStatus) {
   const rowNode = gridApi.getRowNode(rowId);
