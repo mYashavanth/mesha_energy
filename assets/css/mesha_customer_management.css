@@ -14,7 +14,7 @@ body {
 }
 
 /* switch styling start */
-/* From Uiverse.io by arghyaBiswasDev */ 
+/* From Uiverse.io by arghyaBiswasDev */
 /* The switch - the box around the slider */
 .switch {
   font-size: 17px;
@@ -41,7 +41,7 @@ body {
   bottom: -10px;
   background-color: #fff;
   border: 1px solid #adb5bd;
-  transition: .4s;
+  transition: 0.4s;
   border-radius: 30px;
 }
 
@@ -54,7 +54,7 @@ body {
   left: 0.27em;
   bottom: 0.25em;
   background-color: #adb5bd;
-  transition: .4s;
+  transition: 0.4s;
 }
 
 input:checked + .slider {
@@ -73,7 +73,7 @@ input:checked + .slider:before {
 
 /* switch styling end */
 
-.gridTopSection{
+.gridTopSection {
   /* border: 1px solid black; */
   display: flex;
   align-items: center;
@@ -82,12 +82,11 @@ input:checked + .slider:before {
   background-color: white;
   border-radius: 8px 8px 0 0;
 }
-.gridTopSection h1{
+.gridTopSection h1 {
   font-size: 20px;
   font-weight: 600;
-
 }
-.gridTopSectionBtns{
+.gridTopSectionBtns {
   /* border: 1px solid black; */
   display: flex;
   gap: 16px;
@@ -97,17 +96,41 @@ input:checked + .slider:before {
   border-radius: 0 0 8px 8px;
   border: none !important;
 }
-.ag-header{
+.ag-header {
   /* border: 1px solid black; */
   background-color: #f8f9f9 !important;
 }
 .ag-header-cell-label {
-  font-family: 'Public Sans', sans-serif !important;
-  font-weight: 700; 
+  font-family: "Public Sans", sans-serif !important;
+  font-weight: 700;
 }
 
 .ag-cell {
-  font-family: 'Public Sans', sans-serif !important;
+  font-family: "Public Sans", sans-serif !important;
   font-size: 14px;
 }
 /* ag grid styles end */
+/* modal styling start */
+.modalInputs {
+  /* border: 1px solid black; */
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0 16px;
+}
+.modalInput input:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  border: 1px solid #0d5e36;
+}
+.modal-footer{
+  display: flex !important;
+  justify-content: space-between !important;
+  /* border: 1px solid black !important; */
+  padding: 16px 28px !important;
+}
+.modal-footer button{
+  min-width: 100px !important;
+}
+
+/* modal styling end */

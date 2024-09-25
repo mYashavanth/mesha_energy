@@ -94,7 +94,7 @@
         <div class="modal-content">
           <div class="modal-header">
             <h1 class="modal-title fs-5" id="staticBackdropLabel">
-              Modal title
+              Add New Customer
             </h1>
             <button
               type="button"
@@ -104,16 +104,64 @@
             ></button>
           </div>
           <form onsubmit="handleSubmit(event)">
-            <div class="modal-body">...</div>
-            <div class="modal-footer">
+            <div class="modal-body">
+              <div class="modalInputs">
+                <div class="modalInput">
+                  <label for="CustomerName">Customer Name</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="CustomerName"
+                    placeholder="Enter Customer Name"
+                  />
+                </div>
+                <div class="modalInput">
+                  <label for="contactNumber">Contact Number</label>
+                  <input
+                    type="tel"
+                    class="form-control"
+                    id="contactNumber"
+                    placeholder="Enter Contact Number"
+                  />
+                </div>
+                <div class="modalInput">
+                  <label for="emailId">Email ID</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="emailId"
+                    placeholder="Enter Email ID"
+                  />
+                </div>
+                <div class="modalInput">
+                  <label for="loginPassword">Temporary login password</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="loginPassword"
+                    placeholder="Enter Temporary login password"
+                  />
+                </div>
+                <div class="modalInput">
+                  <label for="companyAddress">Company Address</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="companyAddress"
+                    placeholder="Enter Company Address"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer" >
               <button
                 type="button"
                 class="btn btn-secondary"
                 data-bs-dismiss="modal"
               >
-                Close
+                Cancel
               </button>
-              <button type="submit" class="btn btn-primary">Understood</button>
+              <button type="submit" class="btn btn-success">Add</button>
             </div>
           </form>
         </div>
