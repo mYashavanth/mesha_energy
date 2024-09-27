@@ -118,6 +118,10 @@ const gridOptions = {
     filter: "agTextColumnFilter",
     floatingFilter: true,
     flex: 1,
+    filterParams: {
+      debounceMs: 0,
+      buttons: ["reset"],
+    },
   },
   domLayout: "autoHeight",
   getRowHeight: function (params) {

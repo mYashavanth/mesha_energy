@@ -32,19 +32,19 @@ function loadNavBar() {
             class="accordion-collapse collapse"
             data-bs-parent="#accordionExample"
           >
-            <div class="navItems" id="device-management-1-link">
+            <div class="navItems" id="device-management-link">
               <i
                 class="bi bi-house-door"
                 style="font-size: 20px; color: transparent"
               ></i>
-              <p>Device Management 1</p>
+              <p>Device Management</p>
             </div>
-            <div class="navItems" id="device-management-2-link">
+            <div class="navItems" id="user-role-management-link">
               <i
                 class="bi bi-house-door"
                 style="font-size: 20px; color: transparent"
               ></i>
-              <p>Device Management 2</p>
+              <p>User Role Management</p>
             </div>
           </div>
         </div>
@@ -90,6 +90,17 @@ function loadNavBar() {
     .addEventListener("click", function () {
       window.location.href = "/mesha_customer_management.html";
     });
+  document
+    .getElementById("device-management-link")
+    .addEventListener("click", function () {
+      window.location.href = "/device-management.html";
+    });
+  document
+    .getElementById("user-role-management-link")
+    .addEventListener("click", function () {
+      window.location.href = "/user_role_management.html";
+    });
+    
 }
 
 function setActiveLink() {
@@ -100,8 +111,8 @@ function setActiveLink() {
     "/index.html": "dashboard_link",
     "/mesha_customer_management.html": "mesha_customer_management_link",
     "/customer-management": "customer_management_link",
-    "/device-management-1": "device-management-1-link",
-    "/device-management-2": "device-management-2-link",
+    "/device-management.html": "device-management-link",
+    "/user_role_management.html": "user-role-management-link",
     "/map-view": "map-view-link",
     "/settings": "settings-link",
     "/profile": "profile-link",
@@ -115,6 +126,22 @@ function setActiveLink() {
 
   if (links[path]) {
     document.getElementById(links[path]).classList.add("active");
+  }
+
+  // Check if any of the accordion links are active and open the accordion if needed
+  const accordionLinks = [
+    "/device-management.html",
+    "/user_role_management.html",
+  ];
+  const isAccordionActive = accordionLinks.includes(path);
+
+  if (isAccordionActive) {
+    const accordionButton = document.querySelector(".accordion-button");
+    accordionButton.classList.remove("collapsed");
+    accordionButton.setAttribute("aria-expanded", "true");
+
+    const accordionCollapse = document.getElementById("flush-collapseOne");
+    accordionCollapse.classList.add("show");
   }
 }
 
