@@ -32,26 +32,30 @@ function loadNavBar() {
             class="accordion-collapse collapse"
             data-bs-parent="#accordionExample"
           >
-            <div class="navItems" id="device-management-link">
+            <div class="navItems" id="device_management-link">
               <i
                 class="bi bi-house-door"
                 style="font-size: 20px; color: transparent"
               ></i>
               <p>Device Management</p>
             </div>
-            <div class="navItems" id="user-role-management-link">
-              <i
-                class="bi bi-house-door"
+            <div class="navItems" id="customer_management_link">
+              <i 
+                class="bi bi-people" 
                 style="font-size: 20px; color: transparent"
               ></i>
-              <p>User Role Management</p>
+              <p>Device Parameters</p>
             </div>
           </div>
         </div>
       </div>
-      <div class="navItems" id="customer_management_link">
-        <i class="bi bi-people" style="font-size: 20px"></i>
-        <p>Customer Management</p>
+      <div class="navItems" id="user_role_management_link">
+        <i class="bi bi-people" style="font-size: 20px;" ></i>
+        <p>User Role Management</p>
+      </div>
+      <div class="navItems" id="super_user_role_management_link">
+        <i class="bi bi-people" style="font-size: 20px;" ></i>
+        <p>Super User Role Management</p>
       </div>
       <div class="navItems" id="map-view-link">
         <i class="bi bi-pin-map" style="font-size: 20px"></i>
@@ -91,16 +95,20 @@ function loadNavBar() {
       window.location.href = "/mesha_customer_management.html";
     });
   document
-    .getElementById("device-management-link")
+    .getElementById("device_management-link")
     .addEventListener("click", function () {
-      window.location.href = "/device-management.html";
+      window.location.href = "/device_management.html";
     });
   document
-    .getElementById("user-role-management-link")
+    .getElementById("user_role_management_link")
     .addEventListener("click", function () {
       window.location.href = "/user_role_management.html";
     });
-    
+  document
+    .getElementById("super_user_role_management_link")
+    .addEventListener("click", function () {
+      window.location.href = "/super_user_role_management.html";
+    });
 }
 
 function setActiveLink() {
@@ -111,8 +119,9 @@ function setActiveLink() {
     "/index.html": "dashboard_link",
     "/mesha_customer_management.html": "mesha_customer_management_link",
     "/customer-management": "customer_management_link",
-    "/device-management.html": "device-management-link",
-    "/user_role_management.html": "user-role-management-link",
+    "/device_management.html": "device_management-link",
+    "/user_role_management.html": "user_role_management_link",
+    "/super_user_role_management.html": "super_user_role_management_link",
     "/map-view": "map-view-link",
     "/settings": "settings-link",
     "/profile": "profile-link",
@@ -129,10 +138,7 @@ function setActiveLink() {
   }
 
   // Check if any of the accordion links are active and open the accordion if needed
-  const accordionLinks = [
-    "/device-management.html",
-    "/user_role_management.html",
-  ];
+  const accordionLinks = ["/device_management.html", "/device_parameters.html"];
   const isAccordionActive = accordionLinks.includes(path);
 
   if (isAccordionActive) {
