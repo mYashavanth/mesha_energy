@@ -56,6 +56,7 @@
               class="btn btn-success"
               data-bs-toggle="modal"
               data-bs-target="#staticBackdrop"
+              onclick="onBtnAdd()"
             >
               <i class="bi bi-plus-circle"></i> Add New Customer
             </button>
@@ -86,7 +87,7 @@
       aria-labelledby="staticBackdropLabel"
       aria-hidden="true"
     >
-      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
             <h1 class="modal-title fs-5" id="staticBackdropLabel">
@@ -105,46 +106,25 @@
                 <div class="modalInput">
                   <label for="CustomerName">Customer Name</label>
                   <input
+                    name="CustomerName"
                     type="text"
                     class="form-control"
-                    id="CustomerName"
+                    id="customerName"
                     placeholder="Enter Customer Name"
-                  />
-                </div>
-                <div class="modalInput">
-                  <label for="contactNumber">Contact Number</label>
-                  <input
-                    type="tel"
-                    class="form-control"
-                    id="contactNumber"
-                    placeholder="Enter Contact Number"
-                  />
-                </div>
-                <div class="modalInput">
-                  <label for="emailId">Email ID</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="emailId"
-                    placeholder="Enter Email ID"
-                  />
-                </div>
-                <div class="modalInput">
-                  <label for="loginPassword">Temporary login password</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="loginPassword"
-                    placeholder="Enter Temporary login password"
+                    onchange="handlechange(event)"
+                    required
                   />
                 </div>
                 <div class="modalInput">
                   <label for="companyAddress">Company Address</label>
                   <input
+                    name="companyAddress"
                     type="text"
                     class="form-control"
                     id="companyAddress"
                     placeholder="Enter Company Address"
+                    onchange="handlechange(event)"
+                    required
                   />
                 </div>
               </div>
@@ -168,9 +148,3 @@
 </html>
 <script src="./assets/js/navbar.js"></script>
 <script src="./assets/js/mesha_customer_management.js"></script>
-<script>
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    console.log("form submitted");
-  };
-</script>
