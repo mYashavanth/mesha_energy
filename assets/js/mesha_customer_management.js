@@ -50,7 +50,8 @@ function formatDate(dateString) {
   hours = hours % 12; // Convert to 12-hour format
   hours = hours ? String(hours).padStart(2, "0") : "12"; // If hours is 0, set to 12
 
-  return `${day}-${month}-${year} ${hours}:${minutes} ${ampm}`; // Include AM/PM
+  // ${hours}:${minutes} ${ampm}`; // Include tiem
+  return `${day}-${month}-${year}`;
 }
 let isEditing = false;
 const customerData = {
@@ -179,6 +180,7 @@ async function fetchCustomerData(gridApi) {
     gridApi.setGridOption("rowData", formattedData);
   } catch (error) {
     console.error("Error fetching customer data:", error);
+    window.location.href = "login.html";
   }
 }
 
@@ -257,7 +259,7 @@ const gridOptions = {
       filter: "agDateColumnFilter", // Enable date filter
       filterParams: {
         comparator: (filterLocalDateAtMidnight, cellValue) => {
-          cellValue = cellValue.split(" ")[0];
+          // cellValue = cellValue.split(" ")[0];
           const dateParts = cellValue.split("-");
           const year = Number(dateParts[2]);
           const month = Number(dateParts[1]) - 1; // Months are zero-based in JS
@@ -323,8 +325,8 @@ const gridOptions = {
       : 80;
   },
   pagination: true,
-  paginationPageSize: 5,
-  paginationPageSizeSelector: [5, 10, 15],
+  paginationPageSize: 10,
+  paginationPageSizeSelector: [10, 20, 30],
   suppressExcelExport: true,
 };
 

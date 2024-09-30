@@ -48,9 +48,10 @@ document.addEventListener("DOMContentLoaded", function () {
           // Successful login, store the token in localStorage
           localStorage.setItem("authToken", data.token);
           console.log("Token:", data.token);
-
+          
           // Show Bootstrap toast for successful login
           toast.show();
+          window.location.href = "mesha_customer_management.html";
         } else {
           console.log("Error:", data);
           errorDiv.textContent = data.message + " Please try again.";
