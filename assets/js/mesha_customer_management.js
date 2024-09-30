@@ -1,3 +1,4 @@
+// Define StatusCellRenderer class
 class StatusCellRenderer {
   init(params) {
     this.eGui = document.createElement("div");
@@ -30,40 +31,55 @@ class StatusCellRenderer {
   }
 }
 
-const gridOptions = {
-  rowData: [
-    {
-      customerName: "John Doe",
-      companyAddress: "123 Main St, New York, NY",
-      devicesTagged: ["Device A", "Device B", "Device C"],
-      status: 1,
-    },
-    {
-      customerName: "Jane Smith",
-      companyAddress: "456 Elm St, Los Angeles, CA",
-      devicesTagged: ["Device X", "Device Y"],
-      status: 0,
-    },
-    {
-      customerName: "Michael Johnson",
-      companyAddress: "789 Maple Ave, Chicago, IL",
-      devicesTagged: ["Device P", "Device Q", "Device R", "Device S"],
-      status: 1,
-    },
-    {
-      customerName: "Emily Davis",
-      companyAddress: "101 Pine Rd, Austin, TX",
-      devicesTagged: ["Device M", "Device N"],
-      status: 1,
-    },
-    {
-      customerName: "Chris Brown",
-      companyAddress: "202 Oak St, Miami, FL",
-      devicesTagged: ["Device G", "Device H", "Device I"],
-      status: 0,
-    },
-  ],
+// Helper function to format date in "dd-mm-yyyy time" format
+function formatDate(dateString) {
+  const date = new Date(dateString);
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-based
+  const year = date.getFullYear();
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  return `${day}-${month}-${year} ${hours}:${minutes}`;
+}
 
+// Function to fetch data from API
+async function fetchCustomerData(gridApi) {
+  const authToken = localStorage.getItem("authToken");
+  const apiUrl = `https://stingray-app-4smpo.ondigitalocean.app/customers/all/${authToken}`;
+
+  try {
+    const response = await fetch(apiUrl, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    // Format the data for ag-Grid
+    const formattedData = data.map((item) => ({
+      customerName: item.customer_name,
+      companyAddress: item.company_address,
+      createdDate: formatDate(item.created_date), // Format date here
+      devicesTagged: [], // Since the actual data doesn't have this field, default it to an empty array
+      status: item.status,
+    }));
+
+    // Update ag-Grid row data
+    gridApi.setGridOption("rowData", formattedData);
+  } catch (error) {
+    console.error("Error fetching customer data:", error);
+  }
+}
+
+// Define gridOptions after StatusCellRenderer class is defined
+const gridOptions = {
+  rowData: [],
   columnDefs: [
     {
       headerName: "Customer Name",
@@ -86,6 +102,12 @@ const gridOptions = {
               </ol>
             </div>`;
       },
+    },
+    {
+      headerName: "Created Date",
+      field: "createdDate", // Use the formatted date field
+      filter: false,
+      sortable: true,
     },
     {
       headerName: "Status",
@@ -134,13 +156,23 @@ const gridOptions = {
   paginationPageSizeSelector: [5, 10, 15],
   suppressExcelExport: true,
 };
+
+// Initialize the grid after DOM content is loaded
+document.addEventListener("DOMContentLoaded", function () {
+  const gridDiv = document.querySelector("#myGrid");
+  gridApi = agGrid.createGrid(gridDiv, gridOptions);
+  
+  
+
+  // Fetch customer data after initializing the grid
+  fetchCustomerData(gridApi);
+});
+
+// Function to handle editing
 function handleEdit(rowData) {
   console.log("Edit button clicked for:", rowData);
 }
 
-function onBtnExport() {
-  gridApi.exportDataAsCsv();
-}
 // Toggle status function to handle changes
 function toggleStatus(rowId, newStatus) {
   const rowNode = gridApi.getRowNode(rowId);
@@ -150,8 +182,6 @@ function toggleStatus(rowId, newStatus) {
   console.log(`Status for row ${rowId} changed to ${newStatus}`);
 }
 
-// Initialize the grid
-document.addEventListener("DOMContentLoaded", function () {
-  const gridDiv = document.querySelector("#myGrid");
-  gridApi = agGrid.createGrid(gridDiv, gridOptions);
-});
+function onBtnExport() {
+  gridApi.exportDataAsCsv();
+}
