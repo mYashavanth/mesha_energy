@@ -108,11 +108,11 @@ function loadNavBar() {
     .addEventListener("click", function () {
       window.location.href = "/user_role_management.html";
     });
-  // document
-  //   .getElementById("super_user_role_management_link")
-  //   .addEventListener("click", function () {
-  //     window.location.href = "/super_user_role_management.html";
-  //   });
+  document
+    .getElementById("super_user_role_management_link")
+    .addEventListener("click", function () {
+      window.location.href = "/super_user_role_management.html";
+    });
 }
 
 function setActiveLink() {
