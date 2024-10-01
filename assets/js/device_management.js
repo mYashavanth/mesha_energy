@@ -47,38 +47,85 @@ function formatDate(dateString) {
   return `${day}-${month}-${year}`;
 }
 let isEditing = false;
-const customerData = {
-  id: "",
-  CustomerName: "",
-  companyAddress: "",
+const deviceData = {
+  deviceDbId: "",
+  device_id: "",
+  customerId: "",
 };
-const onBtnAdd = () => {
+async function fetchCustomerData() {
+  const authToken = localStorage.getItem("authToken");
+  const apiUrl = `https://stingray-app-4smpo.ondigitalocean.app/customers/all/${authToken}`;
+
+  try {
+    const response = await fetch(apiUrl, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    if (data.errFlag === 1) {
+      console.log("Customer data:", data, "plese try again");
+    } else {
+      //   console.log({"Customer data:": data.customer_name, "customerId": data.id});
+      let arr = data.map((item) => ({
+        customerId: item.id,
+        customerName: item.customer_name,
+      }));
+      console.log({ arr });
+      const customerIdSelect = document.getElementById("customerId");
+
+      customerIdSelect.innerHTML = "";
+
+      const option = document.createElement("option");
+      option.value = "";
+      option.text = "select customer name";
+      option.selected = true;
+      customerIdSelect.appendChild(option);
+
+      arr.forEach((item) => {
+        const option = document.createElement("option");
+        option.value = item.customerId;
+        option.text = item.customerName;
+        if (item.customerName === deviceData.customerId) {
+          option.selected = true;
+          deviceData.customerId = item.customerId;
+          console.log({ deviceData });
+        }
+        customerIdSelect.appendChild(option);
+      });
+    }
+  } catch (error) {
+    console.error("Error fetching customer data:", error);
+  }
+}
+const onBtnAdd = async () => {
   isEditing = false;
-  customerData.id = "";
-  customerData.CustomerName = "";
-  customerData.companyAddress = "";
-  const customerInput = document.getElementById("customerName");
-  const companyAddressInput = document.getElementById("companyAddress");
-  customerInput.value = "";
-  companyAddressInput.value = "";
+  deviceData.deviceDbId = "";
+  deviceData.device_id = "";
+  deviceData.customerId = "";
+  const deviceIdinput = document.getElementById("deviceID");
+  deviceIdinput.value = "";
+  await fetchCustomerData();
 };
 // Function to handle editing
 function handleEdit(rowData) {
   isEditing = true;
-  console.log("Edit button clicked for:", rowData);
-  // const customerInput = document.getElementById("customerName");
-  // const companyAddressInput = document.getElementById("companyAddress");
+  console.log("Edit button clicked for:", rowData, "isEditing:", isEditing);
+  const deviceIdinput = document.getElementById("deviceID");
 
-  // customerInput.value = rowData.customerName;
-  // companyAddressInput.value = rowData.companyAddress;
-  // console.log({
-  //   name: rowData.customerName,
-  //   address: rowData.companyAddressm,
-  //   id: rowData.customerId,
-  // });
-  // customerData.id = rowData.customerId;
-  // customerData.CustomerName = rowData.customerName;
-  // customerData.companyAddress = rowData.companyAddress;
+  deviceData.deviceDbId = rowData.id;
+  deviceData.device_id = rowData.deviceId;
+  deviceData.customerId = rowData.customerName;
+
+  deviceIdinput.value = rowData.deviceId;
+  console.log({ deviceData });
+  fetchCustomerData();
 }
 const handleSubmit = (event) => {
   event.preventDefault();
@@ -86,11 +133,16 @@ const handleSubmit = (event) => {
 
   if (!isEditing) {
     const apiUrl =
-      "https://stingray-app-4smpo.ondigitalocean.app/customers/add";
+      "https://stingray-app-4smpo.ondigitalocean.app/device-masters/add";
     const formData = new FormData();
     formData.append("token", authToken);
-    formData.append("customer", customerData.CustomerName);
-    formData.append("customerAddress", customerData.companyAddress);
+    formData.append("device_id", deviceData.device_id);
+    formData.append("customerId", deviceData.customerId);
+    console.log({
+      authToken,
+      device_id: deviceData.device_id,
+      customerId: deviceData.customerId,
+    });
     fetch(apiUrl, {
       method: "POST",
       body: formData,
@@ -100,19 +152,29 @@ const handleSubmit = (event) => {
         console.log("data", data);
         if (data.errFlag === 0) {
           console.log("data", data);
-          fetchSuperAdminUsers(gridApi);
+          fetchDeviceData(gridApi);
           closeModal();
         }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
       });
   } else {
     console.log({ authToken });
     const apiUrl =
-      "https://stingray-app-4smpo.ondigitalocean.app/customers/update";
+      "https://stingray-app-4smpo.ondigitalocean.app/device-masters/update";
     const formData = new FormData();
     formData.append("token", authToken);
-    formData.append("customer", customerData.CustomerName);
-    formData.append("customerAddress", customerData.companyAddress);
-    formData.append("customerId", customerData.id);
+    formData.append("device_id", deviceData.device_id);
+    formData.append("customerId", deviceData.customerId);
+    formData.append("deviceDbId", deviceData.deviceDbId);
+    console.log({
+      authToken,
+      device_id: deviceData.device_id,
+      customerId: deviceData.customerId,
+      deviceDbId: deviceData.deviceDbId,
+    });
+
     fetch(apiUrl, {
       method: "POST",
       body: formData,
@@ -122,9 +184,12 @@ const handleSubmit = (event) => {
         console.log("data", data);
         if (data.errFlag === 0) {
           console.log("data", data);
-          fetchSuperAdminUsers(gridApi);
+          fetchDeviceData(gridApi);
           closeModal();
         }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
       });
   }
 };
@@ -136,12 +201,12 @@ function closeModal() {
   }
 }
 const handlechange = (event) => {
-  customerData[event.target.name] = event.target.value;
+  deviceData[event.target.name] = event.target.value;
 };
 // Function to fetch data from API
-async function fetchSuperAdminUsers(gridApi) {
+async function fetchDeviceData(gridApi) {
   const authToken = localStorage.getItem("authToken");
-  const apiUrl = `https://stingray-app-4smpo.ondigitalocean.app/super-admin-users/all/${authToken}`;
+  const apiUrl = `https://stingray-app-4smpo.ondigitalocean.app/device-masters/all/${authToken}`;
 
   try {
     const response = await fetch(apiUrl, {
@@ -161,12 +226,14 @@ async function fetchSuperAdminUsers(gridApi) {
 
     // Format the data for ag-Grid
     const formattedData = data.map((item) => ({
-      userName: item.username,
+      customerName: item.customer_name,
+      deviceId: item.device_id,
       createdDate: formatDate(item.created_date),
       status: item.status,
-      email: item.email,
       id: item.id,
+      customerId: item.customer_id,
     }));
+
     // Update ag-Grid row data
     gridApi.setGridOption("rowData", formattedData);
   } catch (error) {
@@ -176,15 +243,15 @@ async function fetchSuperAdminUsers(gridApi) {
 }
 
 // Function to toggle status and make API call
-async function toggleStatus(userId, newStatus) {
+async function toggleStatus(diviceDbId, newStatus) {
   const authToken = localStorage.getItem("authToken");
   const apiUrl =
-    "https://stingray-app-4smpo.ondigitalocean.app/super-admin-users/update/status";
+    "https://stingray-app-4smpo.ondigitalocean.app/device-masters/status";
 
   const formData = new FormData();
   formData.append("token", authToken); // Add the token
   formData.append("status", newStatus); // Add the new status
-  formData.append("superUserId", userId); // Add the customer ID
+  formData.append("deviceDbId", diviceDbId); // Add the customer ID
 
   try {
     const response = await fetch(apiUrl, {
@@ -197,7 +264,10 @@ async function toggleStatus(userId, newStatus) {
     }
 
     const result = await response.json();
-    console.log(`Status updated successfully for customer ${userId}:`, result);
+    console.log(
+      `Status updated successfully for customer ${diviceDbId}:`,
+      result
+    );
     if (result.errFlag === 0) {
       return true; // Indicate success
     }
@@ -220,12 +290,12 @@ const gridOptions = {
       suppressAutoSize: true,
     },
     {
-      headerName: "User Name",
-      field: "userName",
+      headerName: "Device ID",
+      field: "deviceId",
     },
     {
-      headerName: "Email",
-      field: "email",
+      headerName: "Customer Name",
+      field: "customerName",
     },
     {
       headerName: "Created Date",
@@ -271,7 +341,7 @@ const gridOptions = {
                   type="button" 
                   style="margin-top:10px;" 
                   data-bs-toggle="modal"
-                  data-bs-target="#userModal"
+                  data-bs-target="#staticBackdrop"
                   class="btn btn-light" 
                   onclick='handleEdit(${JSON.stringify(params.data)})'
                 >
@@ -308,7 +378,7 @@ document.addEventListener("DOMContentLoaded", function () {
   gridApi = agGrid.createGrid(gridDiv, gridOptions);
 
   // Fetch customer data after initializing the grid
-  fetchSuperAdminUsers(gridApi);
+  fetchDeviceData(gridApi);
 });
 
 // Function to export grid data to CSV

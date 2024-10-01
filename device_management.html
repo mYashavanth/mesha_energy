@@ -57,6 +57,7 @@
               class="btn btn-success"
               data-bs-toggle="modal"
               data-bs-target="#staticBackdrop"
+              onclick="onBtnAdd()"
             >
               <i class="bi bi-plus-circle"></i> Add New Device
             </button>
@@ -104,32 +105,27 @@
                   <div class="modalInput">
                     <label for="deviceID">Device ID</label>
                     <input
+                      name="device_id"
                       type="text"
                       class="form-control"
                       id="deviceID"
                       placeholder="Enter Device ID"
+                      onchange="handlechange(event)"
+                      required
                     />
                   </div>
                   <div class="modalInput">
                     <label for="CustomerName">Customer Name</label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      id="CustomerName"
-                      placeholder="Enter Customer Name"
-                    />
-                  </div>
-
-                  <div class="modalInput">
-                    <label for="additionalDeviceInfo"
-                      >Additional device info</label
+                    <select
+                      name="customerId"
+                      class="form-select"
+                      aria-label="Default select example"
+                      id="customerId"
+                      onchange="handlechange(event)"
+                      required
                     >
-                    <input
-                      type="text"
-                      class="form-control"
-                      id="additionalDeviceInfo"
-                      placeholder="Enter Additional device info"
-                    />
+                      <option selected>select customer name</option>
+                    </select>
                   </div>
                 </div>
               </div>
@@ -152,155 +148,4 @@
   </body>
 </html>
 <script src="./assets/js/navbar.js"></script>
-<script>
-  class StatusCellRenderer {
-    init(params) {
-      this.eGui = document.createElement("div");
-      const isChecked = params.value === 1 ? "checked" : "";
-
-      this.eGui.innerHTML = `
-        <label class="switch">
-          <input type="checkbox" class="checkbox" ${isChecked}>
-          <div class="slider"></div>
-        </label>`;
-
-      const checkbox = this.eGui.querySelector('input[type="checkbox"]');
-      checkbox.addEventListener("change", () => {
-        const newStatus = checkbox.checked ? 1 : 0;
-        params.setValue(newStatus);
-        toggleStatus(params.node.id, newStatus);
-      });
-    }
-
-    getGui() {
-      return this.eGui;
-    }
-
-    refresh(params) {
-      const checkbox = this.eGui.querySelector('input[type="checkbox"]');
-      checkbox.checked = params.value === 1;
-      return true;
-    }
-  }
-
-  const apiData = [
-    {
-      deviceId: "DEV-12345",
-      additionalInfo: "Device with extra sensors",
-      customerName: "John Doe",
-      taggedDateTime: "2024-09-25 10:30 AM",
-      status: 1,
-    },
-    {
-      deviceId: "DEV-54321",
-      additionalInfo: "Standard device",
-      customerName: "Jane Smith",
-      taggedDateTime: "2024-09-25 12:00 PM",
-      status: 0,
-    },
-    {
-      deviceId: "DEV-67890",
-      additionalInfo: "Device with extended battery",
-      customerName: "Michael Johnson",
-      taggedDateTime: "2024-09-25 1:45 PM",
-      status: 1,
-    },
-  ];
-
-  // Adding Serial Number dynamically to each row
-  const rowDataWithSerialNumber = apiData.map((item, index) => ({
-    serialNo: index + 1, // Dynamically assign serial number
-    ...item, // Spread the rest of the item data
-  }));
-
-  const gridOptions = {
-    rowData: rowDataWithSerialNumber,
-
-    columnDefs: [
-      {
-        headerName: "Sl.no",
-        field: "serialNo",
-        filter: false,
-        sortable: false,
-        width: 100,
-      },
-      {
-        headerName: "Device ID",
-        field: "deviceId",
-      },
-      {
-        headerName: "Additional Device Info",
-        field: "additionalInfo",
-      },
-      {
-        headerName: "Customer Name",
-        field: "customerName",
-      },
-      {
-        headerName: "Tagged Date & Time",
-        field: "taggedDateTime",
-      },
-      {
-        headerName: "Status",
-        field: "status",
-        filter: false,
-        sortable: false,
-        cellRenderer: StatusCellRenderer, // Use custom renderer for checkbox
-      },
-      {
-        headerName: "Action",
-        field: "action",
-        filter: false,
-        sortable: false,
-        cellRenderer: function (params) {
-          return `<button 
-                    type="button" 
-                    class="btn btn-light" 
-                    onclick='handleEdit(${JSON.stringify(params.data)})'
-                  >
-                    <i class="bi bi-pencil-square"></i>
-                  </button>`;
-        },
-      },
-    ],
-
-    defaultColDef: {
-      filter: "agTextColumnFilter",
-      floatingFilter: true,
-      sortable: true,
-      flex: 1,
-      filterParams: {
-        debounceMs: 0,
-        buttons: ["reset"],
-      },
-    },
-    domLayout: "autoHeight",
-    pagination: true,
-    paginationPageSize: 5,
-    paginationPageSizeSelector: [5, 10, 15],
-    suppressExcelExport: true,
-  };
-
-  function handleEdit(rowData) {
-    console.log("Edit button clicked for:", rowData);
-  }
-
-  function onBtnExport() {
-    gridApi.exportDataAsCsv();
-  }
-
-  function toggleStatus(rowId, newStatus) {
-    const rowNode = gridApi.getRowNode(rowId);
-    rowNode.setDataValue("status", newStatus);
-    console.log(`Status for row ${rowId} changed to ${newStatus}`);
-  }
-  function handleSubmit(event) {
-    event.preventDefault();
-    console.log("form submitted");
-  }
-
-  document.addEventListener("DOMContentLoaded", function () {
-    const gridDiv = document.querySelector("#myGrid");
-    gridApi = agGrid.createGrid(gridDiv, gridOptions);
-  });
-</script>
+<script src="./assets/js/device_management.js"></script>

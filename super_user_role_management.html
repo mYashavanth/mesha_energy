@@ -86,7 +86,7 @@
       aria-labelledby="userModalLabel"
       aria-hidden="true"
     >
-      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
             <h1 class="modal-title fs-5" id="userModalLabel">Add New User</h1>
@@ -106,6 +106,8 @@
                     type="text"
                     class="form-control"
                     id="CustomerName"
+                    pattern="[A-Za-z\s\-]+"
+                    title="Name must contain only letters, spaces, or hyphens."
                     placeholder="Enter Customer Name"
                   />
                 </div>
@@ -114,6 +116,8 @@
                   <input
                     type="text"
                     class="form-control"
+                    pattern="[A-Za-z\s\-]+"
+                    title="Name must contain only letters, spaces, or hyphens."
                     id="username"
                     placeholder="Enter Username"
                   />
