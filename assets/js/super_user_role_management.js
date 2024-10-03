@@ -1,4 +1,3 @@
-// Define StatusCellRenderer class
 let gridApi;
 class StatusCellRenderer {
   init(params) {
@@ -15,11 +14,10 @@ class StatusCellRenderer {
 
     checkbox.addEventListener("change", async () => {
       const newStatus = checkbox.checked ? 1 : 0;
-      const success = await toggleStatus(params.data.id, newStatus); // Await the API response
+      const success = await toggleStatus(params.data.id, newStatus);
       if (success) {
-        params.setValue(newStatus); // Update status in grid only if the API call is successful
+        params.setValue(newStatus);
       } else {
-        // Revert checkbox state if the API call fails
         checkbox.checked = !checkbox.checked;
       }
     });
@@ -30,67 +28,65 @@ class StatusCellRenderer {
   }
 
   refresh(params) {
-    // Ensure the checkbox is checked/unchecked based on the value
     const checkbox = this.eGui.querySelector('input[type="checkbox"]');
     checkbox.checked = params.value === 1;
     return true;
   }
 }
 
-// Helper function to format date in "dd-mm-yyyy time" format
 function formatDate(dateString) {
   const date = new Date(dateString);
   const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-based
+  const month = String(date.getMonth() + 1).padStart(2, "0");
   const year = date.getFullYear();
 
   return `${day}-${month}-${year}`;
 }
 let isEditing = false;
-const customerData = {
-  id: "",
-  CustomerName: "",
-  companyAddress: "",
+const userData = {
+  super_admin_id: "",
+  username: "",
+  email: "",
+  password: "",
 };
 const onBtnAdd = () => {
   isEditing = false;
-  customerData.id = "";
-  customerData.CustomerName = "";
-  customerData.companyAddress = "";
-  const customerInput = document.getElementById("customerName");
-  const companyAddressInput = document.getElementById("companyAddress");
-  customerInput.value = "";
-  companyAddressInput.value = "";
+  userData.username = "";
+  userData.email = "";
+  userData.password = "";
+
+  const usernameInput = document.getElementById("username");
+  const emailInput = document.getElementById("email");
+  const passwordInput = document.getElementById("password");
+  usernameInput.value = "";
+  emailInput.value = "";
+  passwordInput.value = "";
 };
-// Function to handle editing
 function handleEdit(rowData) {
   isEditing = true;
   console.log("Edit button clicked for:", rowData);
-  // const customerInput = document.getElementById("customerName");
-  // const companyAddressInput = document.getElementById("companyAddress");
-
-  // customerInput.value = rowData.customerName;
-  // companyAddressInput.value = rowData.companyAddress;
-  // console.log({
-  //   name: rowData.customerName,
-  //   address: rowData.companyAddressm,
-  //   id: rowData.customerId,
-  // });
-  // customerData.id = rowData.customerId;
-  // customerData.CustomerName = rowData.customerName;
-  // customerData.companyAddress = rowData.companyAddress;
+  userData.super_admin_id = rowData.id;
+  userData.username = rowData.userName;
+  userData.email = rowData.email;
+  const usernameInput = document.getElementById("username");
+  const emailInput = document.getElementById("email");
+  const passwordInput = document.getElementById("password");
+  usernameInput.value = rowData.userName;
+  emailInput.value = rowData.email;
+  passwordInput.value = "";
 }
-const handleSubmit = (event) => {
+const handleUserSubmit = (event) => {
   event.preventDefault();
   const authToken = localStorage.getItem("authToken");
 
   if (!isEditing) {
     const apiUrl =
-      "https://stingray-app-4smpo.ondigitalocean.app/customers/add";
+      "https://stingray-app-4smpo.ondigitalocean.app/super-admin-users/add";
     const formData = new FormData();
     formData.append("token", authToken);
-    formData.append("customer", customerData.CustomerName);
-    formData.append("customerAddress", customerData.companyAddress);
+    formData.append("username", userData.username);
+    formData.append("email", userData.email);
+    formData.append("password", userData.password);
     fetch(apiUrl, {
       method: "POST",
       body: formData,
@@ -103,16 +99,21 @@ const handleSubmit = (event) => {
           fetchSuperAdminUsers(gridApi);
           closeModal();
         }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
       });
   } else {
     console.log({ authToken });
     const apiUrl =
-      "https://stingray-app-4smpo.ondigitalocean.app/customers/update";
+      "https://stingray-app-4smpo.ondigitalocean.app/super-admin-users/update";
     const formData = new FormData();
     formData.append("token", authToken);
-    formData.append("customer", customerData.CustomerName);
-    formData.append("customerAddress", customerData.companyAddress);
-    formData.append("customerId", customerData.id);
+    formData.append("username", userData.username);
+    formData.append("email", userData.email);
+    formData.append("password", userData.password);
+    formData.append("super_admin_id", userData.super_admin_id);
+
     fetch(apiUrl, {
       method: "POST",
       body: formData,
@@ -125,20 +126,22 @@ const handleSubmit = (event) => {
           fetchSuperAdminUsers(gridApi);
           closeModal();
         }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
       });
   }
 };
 function closeModal() {
-  const modalElement = document.getElementById("staticBackdrop");
+  const modalElement = document.getElementById("userModal");
   const modal = bootstrap.Modal.getInstance(modalElement);
   if (modal) {
     modal.hide();
   }
 }
 const handlechange = (event) => {
-  customerData[event.target.name] = event.target.value;
+  userData[event.target.name] = event.target.value;
 };
-// Function to fetch data from API
 async function fetchSuperAdminUsers(gridApi) {
   const authToken = localStorage.getItem("authToken");
   const apiUrl = `https://stingray-app-4smpo.ondigitalocean.app/super-admin-users/all/${authToken}`;
@@ -159,7 +162,6 @@ async function fetchSuperAdminUsers(gridApi) {
 
     console.log("Customer data:", data);
 
-    // Format the data for ag-Grid
     const formattedData = data.map((item) => ({
       userName: item.username,
       createdDate: formatDate(item.created_date),
@@ -167,24 +169,22 @@ async function fetchSuperAdminUsers(gridApi) {
       email: item.email,
       id: item.id,
     }));
-    // Update ag-Grid row data
     gridApi.setGridOption("rowData", formattedData);
   } catch (error) {
     console.error("Error fetching customer data:", error);
-    // window.location.href = "login.html";
+    window.location.href = "login.html";
   }
 }
 
-// Function to toggle status and make API call
 async function toggleStatus(userId, newStatus) {
   const authToken = localStorage.getItem("authToken");
   const apiUrl =
     "https://stingray-app-4smpo.ondigitalocean.app/super-admin-users/update/status";
 
   const formData = new FormData();
-  formData.append("token", authToken); // Add the token
-  formData.append("status", newStatus); // Add the new status
-  formData.append("superUserId", userId); // Add the customer ID
+  formData.append("token", authToken);
+  formData.append("status", newStatus);
+  formData.append("superUserId", userId);
 
   try {
     const response = await fetch(apiUrl, {
@@ -199,21 +199,20 @@ async function toggleStatus(userId, newStatus) {
     const result = await response.json();
     console.log(`Status updated successfully for customer ${userId}:`, result);
     if (result.errFlag === 0) {
-      return true; // Indicate success
+      return true;
     }
     return false;
   } catch (error) {
     console.error("Error updating customer status:", error);
-    return false; // Indicate failure
+    return false;
   }
 }
 
-// Define gridOptions after StatusCellRenderer class is defined
 const gridOptions = {
   rowData: [],
   columnDefs: [
     {
-      headerName: "Sl. No", // Serial number column
+      headerName: "Sl. No",
       field: "id",
       maxWidth: 100,
       filter: false,
@@ -229,23 +228,22 @@ const gridOptions = {
     },
     {
       headerName: "Created Date",
-      field: "createdDate", // Use the formatted date field
-      filter: "agDateColumnFilter", // Enable date filter
+      field: "createdDate",
+      filter: "agDateColumnFilter",
       filterParams: {
         comparator: (filterLocalDateAtMidnight, cellValue) => {
-          // cellValue = cellValue.split(" ")[0];
           const dateParts = cellValue.split("-");
           const year = Number(dateParts[2]);
-          const month = Number(dateParts[1]) - 1; // Months are zero-based in JS
+          const month = Number(dateParts[1]) - 1;
           const day = Number(dateParts[0]);
           const cellDate = new Date(year, month, day);
           // Compare dates
           if (cellDate < filterLocalDateAtMidnight) {
-            return -1; // cell value is before the filter date
+            return -1;
           } else if (cellDate > filterLocalDateAtMidnight) {
-            return 1; // cell value is after the filter date
+            return 1;
           } else {
-            return 0; // dates are equal
+            return 0;
           }
         },
       },
@@ -257,7 +255,11 @@ const gridOptions = {
       sortable: false,
       maxWidth: 150,
       suppressAutoSize: true,
-      cellRenderer: StatusCellRenderer, // Use custom renderer
+      cellRenderer: StatusCellRenderer,
+      cellClassRules: {
+        "disabled-cell": (params) =>
+          params.data.email === localStorage.getItem("userEmail"),
+      },
     },
     {
       headerName: "Action",
@@ -278,11 +280,14 @@ const gridOptions = {
                   <i class="bi bi-pencil-square"></i>
                 </button>`;
       },
+      cellClassRules: {
+        "disabled-cell": (params) =>
+          params.data.email === localStorage.getItem("userEmail"),
+      },
     },
   ],
 
   defaultColDef: {
-    // give permission to copy dat form each cell
     sortable: true,
     filter: "agTextColumnFilter",
     floatingFilter: true,
@@ -302,16 +307,13 @@ const gridOptions = {
   suppressExcelExport: true,
 };
 
-// Initialize the grid after DOM content is loaded
 document.addEventListener("DOMContentLoaded", function () {
   const gridDiv = document.querySelector("#myGrid");
   gridApi = agGrid.createGrid(gridDiv, gridOptions);
 
-  // Fetch customer data after initializing the grid
   fetchSuperAdminUsers(gridApi);
 });
 
-// Function to export grid data to CSV
 function onBtnExport() {
   gridApi.exportDataAsCsv();
 }

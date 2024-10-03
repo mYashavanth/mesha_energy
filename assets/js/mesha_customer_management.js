@@ -1,4 +1,3 @@
-// Define StatusCellRenderer class
 let gridApi;
 class StatusCellRenderer {
   init(params) {
@@ -15,11 +14,10 @@ class StatusCellRenderer {
 
     checkbox.addEventListener("change", async () => {
       const newStatus = checkbox.checked ? 1 : 0;
-      const success = await toggleStatus(params.data.customerId, newStatus); // Await the API response
+      const success = await toggleStatus(params.data.customerId, newStatus);
       if (success) {
-        params.setValue(newStatus); // Update status in grid only if the API call is successful
+        params.setValue(newStatus);
       } else {
-        // Revert checkbox state if the API call fails
         checkbox.checked = !checkbox.checked;
       }
     });
@@ -30,25 +28,23 @@ class StatusCellRenderer {
   }
 
   refresh(params) {
-    // Ensure the checkbox is checked/unchecked based on the value
     const checkbox = this.eGui.querySelector('input[type="checkbox"]');
     checkbox.checked = params.value === 1;
     return true;
   }
 }
 
-// Helper function to format date in "dd-mm-yyyy time" format
 function formatDate(dateString) {
   const date = new Date(dateString);
   const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-based
+  const month = String(date.getMonth() + 1).padStart(2, "0");
   const year = date.getFullYear();
   let hours = date.getHours();
   const minutes = String(date.getMinutes()).padStart(2, "0");
 
-  const ampm = hours >= 12 ? "PM" : "AM"; // Determine AM/PM
-  hours = hours % 12; // Convert to 12-hour format
-  hours = hours ? String(hours).padStart(2, "0") : "12"; // If hours is 0, set to 12
+  const ampm = hours >= 12 ? "PM" : "AM";
+  hours = hours % 12;
+  hours = hours ? String(hours).padStart(2, "0") : "12";
 
   // ${hours}:${minutes} ${ampm}`; // Include tiem
   return `${day}-${month}-${year}`;
@@ -69,7 +65,6 @@ const onBtnAdd = () => {
   customerInput.value = "";
   companyAddressInput.value = "";
 };
-// Function to handle editing
 function handleEdit(rowData) {
   isEditing = true;
   console.log("Edit button clicked for:", rowData);
@@ -145,7 +140,6 @@ function closeModal() {
 const handlechange = (event) => {
   customerData[event.target.name] = event.target.value;
 };
-// Function to fetch data from API
 async function fetchCustomerData(gridApi) {
   const authToken = localStorage.getItem("authToken");
   const apiUrl = `https://stingray-app-4smpo.ondigitalocean.app/customers/all/${authToken}`;
@@ -166,17 +160,15 @@ async function fetchCustomerData(gridApi) {
 
     console.log("Customer data:", data);
 
-    // Format the data for ag-Grid
     const formattedData = data.map((item) => ({
       customerName: item.customer_name,
       companyAddress: item.company_address,
-      createdDate: formatDate(item.created_date), // Format date here
-      devicesTagged: [], // Since the actual data doesn't have this field, default it to an empty array
+      createdDate: formatDate(item.created_date),
+      devicesTagged: [],
       status: item.status,
       customerId: item.id,
     }));
 
-    // Update ag-Grid row data
     gridApi.setGridOption("rowData", formattedData);
   } catch (error) {
     console.error("Error fetching customer data:", error);
@@ -184,16 +176,15 @@ async function fetchCustomerData(gridApi) {
   }
 }
 
-// Function to toggle status and make API call
 async function toggleStatus(customerId, newStatus) {
   const authToken = localStorage.getItem("authToken");
   const apiUrl =
     "https://stingray-app-4smpo.ondigitalocean.app/customers/status";
 
   const formData = new FormData();
-  formData.append("token", authToken); // Add the token
-  formData.append("status", newStatus); // Add the new status
-  formData.append("customerId", customerId); // Add the customer ID
+  formData.append("token", authToken);
+  formData.append("status", newStatus);
+  formData.append("customerId", customerId);
 
   try {
     const response = await fetch(apiUrl, {
@@ -211,21 +202,20 @@ async function toggleStatus(customerId, newStatus) {
       result
     );
     if (result.errFlag === 0) {
-      return true; // Indicate success
+      return true;
     }
     return false;
   } catch (error) {
     console.error("Error updating customer status:", error);
-    return false; // Indicate failure
+    return false;
   }
 }
 
-// Define gridOptions after StatusCellRenderer class is defined
 const gridOptions = {
   rowData: [],
   columnDefs: [
     {
-      headerName: "Sl. No", // Serial number column
+      headerName: "Sl. No",
       field: "customerId",
       maxWidth: 100,
       filter: false,
@@ -255,23 +245,21 @@ const gridOptions = {
     },
     {
       headerName: "Created Date",
-      field: "createdDate", // Use the formatted date field
-      filter: "agDateColumnFilter", // Enable date filter
+      field: "createdDate",
+      filter: "agDateColumnFilter",
       filterParams: {
         comparator: (filterLocalDateAtMidnight, cellValue) => {
-          // cellValue = cellValue.split(" ")[0];
           const dateParts = cellValue.split("-");
           const year = Number(dateParts[2]);
-          const month = Number(dateParts[1]) - 1; // Months are zero-based in JS
+          const month = Number(dateParts[1]) - 1;
           const day = Number(dateParts[0]);
           const cellDate = new Date(year, month, day);
-          // Compare dates
           if (cellDate < filterLocalDateAtMidnight) {
-            return -1; // cell value is before the filter date
+            return -1;
           } else if (cellDate > filterLocalDateAtMidnight) {
-            return 1; // cell value is after the filter date
+            return 1;
           } else {
-            return 0; // dates are equal
+            return 0;
           }
         },
       },
@@ -283,7 +271,7 @@ const gridOptions = {
       sortable: false,
       maxWidth: 150,
       suppressAutoSize: true,
-      cellRenderer: StatusCellRenderer, // Use custom renderer
+      cellRenderer: StatusCellRenderer,
     },
     {
       headerName: "Action",
@@ -308,7 +296,6 @@ const gridOptions = {
   ],
 
   defaultColDef: {
-    // give permission to copy dat form each cell
     sortable: true,
     filter: "agTextColumnFilter",
     floatingFilter: true,
@@ -330,16 +317,13 @@ const gridOptions = {
   suppressExcelExport: true,
 };
 
-// Initialize the grid after DOM content is loaded
 document.addEventListener("DOMContentLoaded", function () {
   const gridDiv = document.querySelector("#myGrid");
   gridApi = agGrid.createGrid(gridDiv, gridOptions);
 
-  // Fetch customer data after initializing the grid
   fetchCustomerData(gridApi);
 });
 
-// Function to export grid data to CSV
 function onBtnExport() {
   gridApi.exportDataAsCsv();
 }

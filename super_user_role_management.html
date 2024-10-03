@@ -31,6 +31,14 @@
     />
     <!-- ag-grid -->
     <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
+    <style>
+      .disabled-cell {
+        pointer-events: none;
+        background-color: #f8f9fa;
+        color: #999;
+        backdrop-filter: blur(5px);
+      }
+    </style>
   </head>
   <body>
     <script
@@ -56,6 +64,7 @@
               class="btn btn-success"
               data-bs-toggle="modal"
               data-bs-target="#userModal"
+              onclick="onBtnAdd()"
             >
               <i class="bi bi-plus-circle"></i> Add New User
             </button>
@@ -101,42 +110,39 @@
             <div class="modal-body">
               <div class="modalInputs">
                 <div class="modalInput">
-                  <label for="CustomerName">Customer Name</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="CustomerName"
-                    pattern="[A-Za-z\s\-]+"
-                    title="Name must contain only letters, spaces, or hyphens."
-                    placeholder="Enter Customer Name"
-                  />
-                </div>
-                <div class="modalInput">
                   <label for="username">Username</label>
                   <input
+                    name="username"
                     type="text"
                     class="form-control"
-                    pattern="[A-Za-z\s\-]+"
-                    title="Name must contain only letters, spaces, or hyphens."
                     id="username"
                     placeholder="Enter Username"
+                    onchange="handlechange(event)"
+                    required
                   />
                 </div>
                 <div class="modalInput">
                   <label for="email">Email ID</label>
                   <input
+                    name="email"
                     type="email"
                     class="form-control"
                     id="email"
                     placeholder="Enter Email ID"
+                    onchange="handlechange(event)"
+                    required
                   />
                 </div>
                 <div class="modalInput">
-                  <label for="role">Role</label>
-                  <select class="form-control" id="role">
-                    <option value="Admin">Admin</option>
-                    <option value="User">User</option>
-                  </select>
+                  <label for="password">Password</label>
+                  <input
+                    name="password"
+                    type="text"
+                    class="form-control"
+                    id="password"
+                    placeholder="Enter Password"
+                    onchange="handlechange(event)"
+                  />
                 </div>
               </div>
             </div>

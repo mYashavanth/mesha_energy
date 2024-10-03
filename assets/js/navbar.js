@@ -86,6 +86,7 @@ function loadNavBar() {
 
   document.getElementById("logout-link").addEventListener("click", function () {
     localStorage.removeItem("authToken");
+    localStorage.removeItem("userEmail");
     window.location.href = "/login.html";
   });
   document

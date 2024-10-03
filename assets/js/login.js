@@ -47,6 +47,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (data.errFlag === 0) {
           // Successful login, store the token in localStorage
           localStorage.setItem("authToken", data.token);
+          localStorage.setItem("userEmail", emailInput.value);
           console.log("Token:", data.token);
           
           // Show Bootstrap toast for successful login
