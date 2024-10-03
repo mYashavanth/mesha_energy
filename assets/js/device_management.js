@@ -1,3 +1,8 @@
+const addDeviceBtn = document.getElementById("addDeviceBtn");
+const spinnerHTML = `
+    <div class="spinner-border spinner-border-sm" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div> Please wait...`;
 let gridApi;
 class StatusCellRenderer {
   init(params) {
@@ -101,6 +106,7 @@ async function fetchCustomerData() {
 }
 const onBtnAdd = async () => {
   isEditing = false;
+  addDeviceBtn.innerText = "Add";
   deviceData.deviceDbId = "";
   deviceData.device_id = "";
   deviceData.customerId = "";
@@ -110,6 +116,7 @@ const onBtnAdd = async () => {
 };
 function handleEdit(rowData) {
   isEditing = true;
+  addDeviceBtn.innerText = "Update";
   console.log("Edit button clicked for:", rowData, "isEditing:", isEditing);
   const deviceIdinput = document.getElementById("deviceID");
 
@@ -121,72 +128,49 @@ function handleEdit(rowData) {
   console.log({ deviceData });
   fetchCustomerData();
 }
-const handleSubmit = (event) => {
+const handleSubmit = async (event) => {
   event.preventDefault();
   const authToken = localStorage.getItem("authToken");
 
-  if (!isEditing) {
-    const apiUrl =
-      "https://stingray-app-4smpo.ondigitalocean.app/device-masters/add";
+  try {
+    addDeviceBtn.disabled = true;
+    addDeviceBtn.innerHTML = spinnerHTML;
+    const apiUrl = isEditing
+      ? "https://stingray-app-4smpo.ondigitalocean.app/device-masters/update"
+      : "https://stingray-app-4smpo.ondigitalocean.app/device-masters/add";
+
     const formData = new FormData();
     formData.append("token", authToken);
     formData.append("device_id", deviceData.device_id);
     formData.append("customerId", deviceData.customerId);
-    console.log({
-      authToken,
-      device_id: deviceData.device_id,
-      customerId: deviceData.customerId,
-    });
-    fetch(apiUrl, {
+
+    if (isEditing) {
+      formData.append("deviceDbId", deviceData.deviceDbId);
+    }
+
+    const response = await fetch(apiUrl, {
       method: "POST",
       body: formData,
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("data", data);
-        if (data.errFlag === 0) {
-          console.log("data", data);
-          fetchDeviceData(gridApi);
-          closeModal();
-        }
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
-  } else {
-    console.log({ authToken });
-    const apiUrl =
-      "https://stingray-app-4smpo.ondigitalocean.app/device-masters/update";
-    const formData = new FormData();
-    formData.append("token", authToken);
-    formData.append("device_id", deviceData.device_id);
-    formData.append("customerId", deviceData.customerId);
-    formData.append("deviceDbId", deviceData.deviceDbId);
-    console.log({
-      authToken,
-      device_id: deviceData.device_id,
-      customerId: deviceData.customerId,
-      deviceDbId: deviceData.deviceDbId,
     });
 
-    fetch(apiUrl, {
-      method: "POST",
-      body: formData,
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("data", data);
-        if (data.errFlag === 0) {
-          console.log("data", data);
-          fetchDeviceData(gridApi);
-          closeModal();
-        }
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
+    const data = await response.json();
+
+    console.log("data", data);
+
+    if (data.errFlag === 0) {
+      fetchDeviceData(gridApi);
+      closeModal();
+    } else {
+      console.error("Server returned an error:", data);
+    }
+  } catch (error) {
+    console.error("Error occurred during submission:", error);
+  } finally {
+    addDeviceBtn.disabled = false;
+    addDeviceBtn.innerText = "Add";
   }
 };
+
 function closeModal() {
   const modalElement = document.getElementById("staticBackdrop");
   const modal = bootstrap.Modal.getInstance(modalElement);

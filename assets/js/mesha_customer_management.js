@@ -1,3 +1,8 @@
+const addCustomerBtn = document.getElementById("addCustomerBtn");
+const spinnerHTML = `
+    <div class="spinner-border spinner-border-sm" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div> Please wait...`;
 let gridApi;
 class StatusCellRenderer {
   init(params) {
@@ -57,6 +62,7 @@ const customerData = {
 };
 const onBtnAdd = () => {
   isEditing = false;
+  addCustomerBtn.innerText = "Add";
   customerData.id = "";
   customerData.CustomerName = "";
   customerData.companyAddress = "";
@@ -67,6 +73,7 @@ const onBtnAdd = () => {
 };
 function handleEdit(rowData) {
   isEditing = true;
+  addCustomerBtn.innerText = "Update";
   console.log("Edit button clicked for:", rowData);
   const customerInput = document.getElementById("customerName");
   const companyAddressInput = document.getElementById("companyAddress");
@@ -82,54 +89,49 @@ function handleEdit(rowData) {
   customerData.CustomerName = rowData.customerName;
   customerData.companyAddress = rowData.companyAddress;
 }
-const handleSubmit = (event) => {
+const handleSubmit = async (event) => {
   event.preventDefault();
   const authToken = localStorage.getItem("authToken");
 
-  if (!isEditing) {
-    const apiUrl =
-      "https://stingray-app-4smpo.ondigitalocean.app/customers/add";
+  try {
+    addCustomerBtn.disabled = true;
+    addCustomerBtn.innerHTML = spinnerHTML;
+    const apiUrl = isEditing
+      ? "https://stingray-app-4smpo.ondigitalocean.app/customers/update"
+      : "https://stingray-app-4smpo.ondigitalocean.app/customers/add";
+
     const formData = new FormData();
     formData.append("token", authToken);
     formData.append("customer", customerData.CustomerName);
     formData.append("customerAddress", customerData.companyAddress);
-    fetch(apiUrl, {
+
+    if (isEditing) {
+      formData.append("customerId", customerData.id);
+    }
+
+    const response = await fetch(apiUrl, {
       method: "POST",
       body: formData,
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("data", data);
-        if (data.errFlag === 0) {
-          console.log("data", data);
-          fetchCustomerData(gridApi);
-          closeModal();
-        }
-      });
-  } else {
-    console.log({ authToken });
-    const apiUrl =
-      "https://stingray-app-4smpo.ondigitalocean.app/customers/update";
-    const formData = new FormData();
-    formData.append("token", authToken);
-    formData.append("customer", customerData.CustomerName);
-    formData.append("customerAddress", customerData.companyAddress);
-    formData.append("customerId", customerData.id);
-    fetch(apiUrl, {
-      method: "POST",
-      body: formData,
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("data", data);
-        if (data.errFlag === 0) {
-          console.log("data", data);
-          fetchCustomerData(gridApi);
-          closeModal();
-        }
-      });
+    });
+
+    const data = await response.json();
+
+    console.log("data", data);
+
+    if (data.errFlag === 0) {
+      fetchCustomerData(gridApi);
+      closeModal();
+    } else {
+      console.error("Server returned an error:", data);
+    }
+  } catch (error) {
+    console.error("Error occurred during submission:", error);
+  } finally {
+    addCustomerBtn.disabled = false;
+    addCustomerBtn.innerHTML = "Add";
   }
 };
+
 function closeModal() {
   const modalElement = document.getElementById("staticBackdrop");
   const modal = bootstrap.Modal.getInstance(modalElement);

@@ -110,8 +110,6 @@
                     type="text"
                     class="form-control"
                     id="customerName"
-                    pattern="[A-Za-z\s\-]+"
-                    title="Name must contain only letters, spaces, or hyphens."
                     placeholder="Enter Customer Name"
                     onchange="handlechange(event)"
                     required
@@ -139,7 +137,7 @@
               >
                 Cancel
               </button>
-              <button type="submit" class="btn btn-success">Add</button>
+              <button type="submit" class="btn btn-success" id="addCustomerBtn">Add</button>
             </div>
           </form>
         </div>

@@ -1,3 +1,8 @@
+const addUserBtn = document.getElementById("addUserBtn");
+const spinnerHTML = `
+    <div class="spinner-border spinner-border-sm" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div> Please wait...`;
 let gridApi;
 class StatusCellRenderer {
   init(params) {
@@ -51,6 +56,7 @@ const userData = {
 };
 const onBtnAdd = () => {
   isEditing = false;
+  addUserBtn.innerText = "Add";
   userData.username = "";
   userData.email = "";
   userData.password = "";
@@ -64,6 +70,7 @@ const onBtnAdd = () => {
 };
 function handleEdit(rowData) {
   isEditing = true;
+  addUserBtn.innerText = "Update";
   console.log("Edit button clicked for:", rowData);
   userData.super_admin_id = rowData.id;
   userData.username = rowData.userName;
@@ -75,63 +82,50 @@ function handleEdit(rowData) {
   emailInput.value = rowData.email;
   passwordInput.value = "";
 }
-const handleUserSubmit = (event) => {
+const handleUserSubmit = async (event) => {
   event.preventDefault();
   const authToken = localStorage.getItem("authToken");
 
-  if (!isEditing) {
-    const apiUrl =
-      "https://stingray-app-4smpo.ondigitalocean.app/super-admin-users/add";
-    const formData = new FormData();
-    formData.append("token", authToken);
-    formData.append("username", userData.username);
-    formData.append("email", userData.email);
-    formData.append("password", userData.password);
-    fetch(apiUrl, {
-      method: "POST",
-      body: formData,
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("data", data);
-        if (data.errFlag === 0) {
-          console.log("data", data);
-          fetchSuperAdminUsers(gridApi);
-          closeModal();
-        }
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
-  } else {
-    console.log({ authToken });
-    const apiUrl =
-      "https://stingray-app-4smpo.ondigitalocean.app/super-admin-users/update";
-    const formData = new FormData();
-    formData.append("token", authToken);
-    formData.append("username", userData.username);
-    formData.append("email", userData.email);
-    formData.append("password", userData.password);
-    formData.append("super_admin_id", userData.super_admin_id);
+  try {
+    addUserBtn.disabled = true;
+    addUserBtn.innerHTML = spinnerHTML;
+    const apiUrl = !isEditing
+      ? "https://stingray-app-4smpo.ondigitalocean.app/super-admin-users/add"
+      : "https://stingray-app-4smpo.ondigitalocean.app/super-admin-users/update";
 
-    fetch(apiUrl, {
+    const formData = new FormData();
+    formData.append("token", authToken);
+    formData.append("username", userData.username);
+    formData.append("email", userData.email);
+    formData.append("password", userData.password);
+
+    if (isEditing) {
+      formData.append("super_admin_id", userData.super_admin_id);
+    }
+
+    const response = await fetch(apiUrl, {
       method: "POST",
       body: formData,
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("data", data);
-        if (data.errFlag === 0) {
-          console.log("data", data);
-          fetchSuperAdminUsers(gridApi);
-          closeModal();
-        }
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
+    });
+
+    const data = await response.json();
+
+    console.log("data", data);
+
+    if (data.errFlag === 0) {
+      fetchSuperAdminUsers(gridApi);
+      closeModal();
+    } else {
+      console.error("Server returned an error:", data);
+    }
+  } catch (error) {
+    console.error("Error occurred during submission:", error);
+  } finally {
+    addUserBtn.disabled = false;
+    addUserBtn.innerHTML = "Add";
   }
 };
+
 function closeModal() {
   const modalElement = document.getElementById("userModal");
   const modal = bootstrap.Modal.getInstance(modalElement);

@@ -6,8 +6,14 @@ document.addEventListener("DOMContentLoaded", function () {
   const errorDiv = document.getElementById("errorDiv");
   const successToastEl = document.getElementById("successToast");
   const toast = new bootstrap.Toast(successToastEl);
+  const loginBtn = document.getElementById("loginBtn");
 
-  // Toggle password visibility
+  // Spinner HTML
+  const spinnerHTML = `
+    <div class="spinner-border spinner-border-sm" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div> Logging in...`;
+
   passwordToggleBtn.addEventListener("click", function () {
     if (passwordInput.type === "password") {
       passwordInput.type = "text";
@@ -18,7 +24,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  // Clear error message when focusing on inputs
   emailInput.addEventListener("change", () => {
     errorDiv.textContent = "";
   });
@@ -27,42 +32,47 @@ document.addEventListener("DOMContentLoaded", function () {
     errorDiv.textContent = "";
   });
 
-  // Handle form submission
-  loginForm.addEventListener("submit", function (event) {
-    event.preventDefault(); // Prevent the default form submission
+  loginForm.addEventListener("submit", async function (event) {
+    event.preventDefault();
 
-    // Clear previous error messages
     errorDiv.textContent = "";
 
-    // Create a new FormData object from the form
     const formData = new FormData(loginForm);
 
-    // Make an API call to the login endpoint
-    fetch("https://stingray-app-4smpo.ondigitalocean.app/super-admin-users", {
-      method: "POST",
-      body: formData, // Use FormData directly
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.errFlag === 0) {
-          // Successful login, store the token in localStorage
-          localStorage.setItem("authToken", data.token);
-          localStorage.setItem("userEmail", emailInput.value);
-          console.log("Token:", data.token);
-          
-          // Show Bootstrap toast for successful login
-          toast.show();
-          window.location.href = "mesha_customer_management.html";
-        } else {
-          console.log("Error:", data);
-          errorDiv.textContent = data.message + " Please try again.";
-          emailInput.focus();
+    try {
+      // Start loading: disable button and show spinner
+      loginBtn.disabled = true;
+      loginBtn.innerHTML = spinnerHTML;
+
+      const response = await fetch(
+        "https://stingray-app-4smpo.ondigitalocean.app/super-admin-users",
+        {
+          method: "POST",
+          body: formData,
         }
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-        // General error handling (network issues, etc.)
-        errorDiv.textContent = "An error occurred, please try again.";
-      });
+      );
+
+      const data = await response.json();
+
+      if (data.errFlag === 0) {
+        localStorage.setItem("authToken", data.token);
+        localStorage.setItem("userEmail", emailInput.value);
+        console.log("Token:", data.token);
+
+        toast.show();
+        window.location.href = "mesha_customer_management.html";
+      } else {
+        console.log("Error:", data);
+        errorDiv.textContent = data.message + " Please try again.";
+        emailInput.focus();
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      errorDiv.textContent = "An error occurred, please try again.";
+    } finally {
+      // Stop loading: re-enable button and restore original text
+      loginBtn.disabled = false;
+      loginBtn.innerHTML = "Login"; // Reset button text after completion
+    }
   });
 });
