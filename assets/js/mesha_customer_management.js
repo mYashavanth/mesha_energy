@@ -1,4 +1,7 @@
 const addCustomerBtn = document.getElementById("addCustomerBtn");
+const customerInput = document.getElementById("customerName");
+const companyAddressInput = document.getElementById("companyAddress");
+const inputValidationMsg = document.getElementById("inputValidationMsg");
 const spinnerHTML = `
     <div class="spinner-border spinner-border-sm" role="status">
       <span class="visually-hidden">Loading...</span>
@@ -66,8 +69,6 @@ const onBtnAdd = () => {
   customerData.id = "";
   customerData.CustomerName = "";
   customerData.companyAddress = "";
-  const customerInput = document.getElementById("customerName");
-  const companyAddressInput = document.getElementById("companyAddress");
   customerInput.value = "";
   companyAddressInput.value = "";
 };
@@ -75,23 +76,28 @@ function handleEdit(rowData) {
   isEditing = true;
   addCustomerBtn.innerText = "Update";
   console.log("Edit button clicked for:", rowData);
-  const customerInput = document.getElementById("customerName");
-  const companyAddressInput = document.getElementById("companyAddress");
-
   customerInput.value = rowData.customerName;
   companyAddressInput.value = rowData.companyAddress;
-  console.log({
-    name: rowData.customerName,
-    address: rowData.companyAddressm,
-    id: rowData.customerId,
-  });
   customerData.id = rowData.customerId;
   customerData.CustomerName = rowData.customerName;
   customerData.companyAddress = rowData.companyAddress;
 }
+customerInput.addEventListener("input", () => {
+  inputValidationMsg.style.display = "none";
+  customerInput.style.borderColor = "";
+})
 const handleSubmit = async (event) => {
   event.preventDefault();
   const authToken = localStorage.getItem("authToken");
+  const nameRegex = /^[a-zA-Z\s'-]+$/;
+  if (!nameRegex.test(customerData.CustomerName)) {
+    inputValidationMsg.style.display = "block";
+    inputValidationMsg.innerText =
+      "Please enter a valid customer name (letters, spaces, and hyphens only).";
+    customerInput.focus();
+    customerInput.style.borderColor = "red";
+    return;
+  }
 
   try {
     addCustomerBtn.disabled = true;
