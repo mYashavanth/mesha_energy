@@ -125,19 +125,17 @@
                     id="username"
                     placeholder="Enter Username"
                     onchange="handlechange(event)"
-                    required
                   />
                 </div>
                 <div class="modalInput">
                   <label for="email">Email ID</label>
                   <input
                     name="email"
-                    type="email"
+                    type="text"
                     class="form-control"
                     id="email"
                     placeholder="Enter Email ID"
                     onchange="handlechange(event)"
-                    required
                   />
                 </div>
                 <div class="modalInput">
@@ -151,6 +149,11 @@
                     onchange="handlechange(event)"
                   />
                 </div>
+                <small
+                  id="inputValidationMsg"
+                  class="text-danger"
+                  style="display: none"
+                ></small>
               </div>
             </div>
             <div class="modal-footer">

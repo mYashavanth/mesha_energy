@@ -1,9 +1,91 @@
 const addUserBtn = document.getElementById("addUserBtn");
+const usernameInput = document.getElementById("username");
+const emailInput = document.getElementById("email");
+const passwordInput = document.getElementById("password");
+const inputValidationMsg = document.getElementById("inputValidationMsg");
 const spinnerHTML = `
     <div class="spinner-border spinner-border-sm" role="status">
       <span class="visually-hidden">Loading...</span>
     </div> Please wait...`;
 let gridApi;
+const usernameRegex =
+  /^(?!.*[<>\\/\[\]{};:])(?!.*(script|alert|confirm|prompt|document|window|eval|onload|onerror|innerHTML|setTimeout|setInterval|XMLHttpRequest|fetch|Function|console))[A-Za-z\s-]+$/;
+const emailRegex =
+  /^(?!.*[<>\\/\[\]{};:])(?!.*(script|alert|confirm|prompt|document|window|eval|onload|onerror|innerHTML|setTimeout|setInterval|XMLHttpRequest|fetch|Function|console))[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const passwordRegex =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])(?!.*[<>\\/\[\]{};:]).{6,}$/;
+
+const validateInputs = () => {
+  let valid = true;
+  let validationMsg = "";
+
+  // Validate username
+  if (!usernameInput.value.trim()) {
+    validationMsg += "Username cannot be empty.\n";
+    valid = false;
+    usernameInput.style.borderColor = "red";
+  } else if (!usernameInput.value.trim().match(usernameRegex)) {
+    validationMsg +=
+      "Username should only contain letters, spaces, or hyphens.\n";
+    valid = false;
+    usernameInput.style.borderColor = "red";
+  } else {
+    usernameInput.style.borderColor = ""; // Clear error styling
+  }
+
+  // Validate email
+  if (!emailInput.value.trim()) {
+    validationMsg += "Email cannot be empty.\n";
+    valid = false;
+    emailInput.style.borderColor = "red";
+  } else if (!emailInput.value.trim().match(emailRegex)) {
+    validationMsg += "Please enter a valid email address.\n";
+    valid = false;
+    emailInput.style.borderColor = "red";
+  } else {
+    emailInput.style.borderColor = ""; // Clear error styling
+  }
+
+  // Validate password (can be empty for editing, otherwise must follow the rules)
+  if (passwordInput.value && !passwordInput.value.trim().match(passwordRegex)) {
+    validationMsg +=
+      "Password must be at least 6 characters long, include one uppercase letter, one lowercase letter, one number, and one symbol.\n";
+    valid = false;
+    passwordInput.style.borderColor = "red";
+  } else {
+    passwordInput.style.borderColor = ""; // Clear error styling
+  }
+
+  // Display or clear validation message
+  if (validationMsg) {
+    inputValidationMsg.innerText = validationMsg;
+    inputValidationMsg.style.display = "block"; // Show message
+  } else {
+    inputValidationMsg.style.display = "none"; // Hide message if valid
+  }
+
+  return valid;
+};
+
+// Focus on the first invalid field
+const focusOnFirstError = () => {
+  if (usernameInput.style.borderColor === "red") {
+    usernameInput.focus();
+  } else if (emailInput.style.borderColor === "red") {
+    emailInput.focus();
+  } else if (passwordInput.style.borderColor === "red") {
+    passwordInput.focus();
+  }
+};
+const clearErrorMessages = (event) => {
+  const inputField = event.target;
+  inputField.style.borderColor = ""; // Clear error styling
+  inputValidationMsg.style.display = "none"; // Hide error message
+};
+
+usernameInput.addEventListener("input", clearErrorMessages);
+emailInput.addEventListener("input", clearErrorMessages);
+passwordInput.addEventListener("input", clearErrorMessages);
 class StatusCellRenderer {
   init(params) {
     this.eGui = document.createElement("div");
@@ -60,10 +142,6 @@ const onBtnAdd = () => {
   userData.username = "";
   userData.email = "";
   userData.password = "";
-
-  const usernameInput = document.getElementById("username");
-  const emailInput = document.getElementById("email");
-  const passwordInput = document.getElementById("password");
   usernameInput.value = "";
   emailInput.value = "";
   passwordInput.value = "";
@@ -75,9 +153,6 @@ function handleEdit(rowData) {
   userData.super_admin_id = rowData.id;
   userData.username = rowData.userName;
   userData.email = rowData.email;
-  const usernameInput = document.getElementById("username");
-  const emailInput = document.getElementById("email");
-  const passwordInput = document.getElementById("password");
   usernameInput.value = rowData.userName;
   emailInput.value = rowData.email;
   passwordInput.value = "";
@@ -85,6 +160,11 @@ function handleEdit(rowData) {
 const handleUserSubmit = async (event) => {
   event.preventDefault();
   const authToken = localStorage.getItem("authToken");
+
+  if (!validateInputs()) {
+    focusOnFirstError();
+    return;
+  }
 
   try {
     addUserBtn.disabled = true;

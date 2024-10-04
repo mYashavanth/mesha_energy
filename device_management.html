@@ -118,7 +118,6 @@
                       id="deviceID"
                       placeholder="Enter Device ID"
                       onchange="handlechange(event)"
-                      required
                     />
                   </div>
                   <div class="modalInput">
@@ -129,11 +128,15 @@
                       aria-label="Default select example"
                       id="customerId"
                       onchange="handlechange(event)"
-                      required
                     >
                       <option selected>select customer name</option>
                     </select>
                   </div>
+                  <small
+                    id="inputValidationMsg"
+                    class="text-danger"
+                    style="display: none"
+                  ></small>
                 </div>
               </div>
               <div class="modal-footer">

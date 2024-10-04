@@ -1,78 +1,126 @@
-document.addEventListener("DOMContentLoaded", function () {
-  const passwordToggleBtn = document.getElementById("button-addon2");
-  const passwordInput = document.getElementById("password");
-  const emailInput = document.getElementById("email");
-  const loginForm = document.querySelector("form");
-  const errorDiv = document.getElementById("errorDiv");
-  const successToastEl = document.getElementById("successToast");
-  const toast = new bootstrap.Toast(successToastEl);
-  const loginBtn = document.getElementById("loginBtn");
+const passwordToggleBtn = document.getElementById("button-addon2");
+const passwordInput = document.getElementById("password");
+const emailInput = document.getElementById("email");
+const inputValidationMsg = document.getElementById("inputValidationMsg");
+const loginBtn = document.getElementById("loginBtn");
+const loginData = {
+  email: "",
+  password: "",
+};
+const emailRegex =
+  /^(?!.*[<>\\/\[\]{};:])(?!.*(script|alert|confirm|prompt|document|window|eval|onload|onerror|innerHTML|setTimeout|setInterval|XMLHttpRequest|fetch|Function|console))[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  // Spinner HTML
-  const spinnerHTML = `
-    <div class="spinner-border spinner-border-sm" role="status">
-      <span class="visually-hidden">Loading...</span>
-    </div> Logging in...`;
+const validateInputs = () => {
+  let valid = true;
+  let validationMsg = "";
 
-  passwordToggleBtn.addEventListener("click", function () {
-    if (passwordInput.type === "password") {
-      passwordInput.type = "text";
-      passwordToggleBtn.innerHTML = '<i class="bi bi-eye-slash"></i>';
-    } else {
-      passwordInput.type = "password";
-      passwordToggleBtn.innerHTML = '<i class="bi bi-eye"></i>';
-    }
-  });
+  if (!emailInput.value.trim()) {
+    validationMsg += "Email cannot be empty.\n";
+    valid = false;
+    emailInput.style.borderColor = "red";
+  } else if (!emailInput.value.trim().match(emailRegex)) {
+    validationMsg += "Please enter a valid email address.\n";
+    valid = false;
+    emailInput.style.borderColor = "red";
+  } else {
+    emailInput.style.borderColor = "";
+  }
 
-  emailInput.addEventListener("change", () => {
-    errorDiv.textContent = "";
-  });
+  if (!passwordInput.value.trim()) {
+    validationMsg += "Password cannot be empty.\n";
+    valid = false;
+    passwordInput.style.borderColor = "red";
+  } else {
+    passwordInput.style.borderColor = "";
+  }
 
-  passwordInput.addEventListener("change", () => {
-    errorDiv.textContent = "";
-  });
+  if (validationMsg) {
+    inputValidationMsg.innerText = validationMsg;
+    inputValidationMsg.style.display = "block";
+  } else {
+    inputValidationMsg.style.display = "none";
+  }
 
-  loginForm.addEventListener("submit", async function (event) {
-    event.preventDefault();
+  return valid;
+};
 
-    errorDiv.textContent = "";
+const focusOnFirstError = () => {
+  if (emailInput.style.borderColor === "red") {
+    emailInput.focus();
+  } else if (passwordInput.style.borderColor === "red") {
+    passwordInput.focus();
+  }
+};
 
-    const formData = new FormData(loginForm);
+const clearErrorMessages = (event) => {
+  const inputField = event.target;
+  inputField.style.borderColor = "";
+  inputValidationMsg.style.display = "none";
+};
 
-    try {
-      // Start loading: disable button and show spinner
-      loginBtn.disabled = true;
-      loginBtn.innerHTML = spinnerHTML;
+emailInput.addEventListener("input", clearErrorMessages);
+passwordInput.addEventListener("input", clearErrorMessages);
 
-      const response = await fetch(
-        "https://stingray-app-4smpo.ondigitalocean.app/super-admin-users",
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
+const spinnerHTML = `
+        <div class="spinner-border spinner-border-sm" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div> Logging in...`;
 
-      const data = await response.json();
-
-      if (data.errFlag === 0) {
-        localStorage.setItem("authToken", data.token);
-        localStorage.setItem("userEmail", emailInput.value);
-        console.log("Token:", data.token);
-
-        toast.show();
-        window.location.href = "mesha_customer_management.html";
-      } else {
-        console.log("Error:", data);
-        errorDiv.textContent = data.message + " Please try again.";
-        emailInput.focus();
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      errorDiv.textContent = "An error occurred, please try again.";
-    } finally {
-      // Stop loading: re-enable button and restore original text
-      loginBtn.disabled = false;
-      loginBtn.innerHTML = "Login"; // Reset button text after completion
-    }
-  });
+passwordToggleBtn.addEventListener("click", function () {
+  if (passwordInput.type === "password") {
+    passwordInput.type = "text";
+    passwordToggleBtn.innerHTML = '<i class="bi bi-eye-slash"></i>';
+  } else {
+    passwordInput.type = "password";
+    passwordToggleBtn.innerHTML = '<i class="bi bi-eye"></i>';
+  }
 });
+
+function handleChange(event) {
+  loginData[event.target.name] = event.target.value;
+}
+
+async function handleSubmit(event) {
+  event.preventDefault();
+
+  if (!validateInputs()) {
+    focusOnFirstError();
+    return;
+  }
+
+  try {
+    loginBtn.disabled = true;
+    loginBtn.innerHTML = spinnerHTML;
+
+    const formData = new FormData();
+    formData.append("email", loginData.email);
+    formData.append("password", loginData.password);
+
+    const response = await fetch(
+      "https://stingray-app-4smpo.ondigitalocean.app/super-admin-users",
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+
+    const data = await response.json();
+
+    if (data.errFlag === 0) {
+      localStorage.setItem("authToken", data.token);
+      localStorage.setItem("userEmail", loginData.email);
+      window.location.href = "mesha_customer_management.html";
+    } else {
+      inputValidationMsg.textContent = data.message + " Please try again.";
+      inputValidationMsg.style.display = "block";
+      emailInput.focus();
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    inputValidationMsg.textContent = "An error occurred, please try again.";
+    inputValidationMsg.style.display = "block";
+  } finally {
+    loginBtn.disabled = false;
+    loginBtn.innerHTML = "Login";
+  }
+}

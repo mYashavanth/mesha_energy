@@ -1,9 +1,72 @@
 const addDeviceBtn = document.getElementById("addDeviceBtn");
+const deviceIdinput = document.getElementById("deviceID");
+const customerIdSelect = document.getElementById("customerId");
+const inputValidationMsg = document.getElementById("inputValidationMsg");
 const spinnerHTML = `
     <div class="spinner-border spinner-border-sm" role="status">
       <span class="visually-hidden">Loading...</span>
     </div> Please wait...`;
 let gridApi;
+const deviceIdRegex =
+  /^(?!.*[<>\\/\[\]{};:])(?!.*(script|alert|confirm|prompt|document|window|eval|onload|onerror|innerHTML|setTimeout|setInterval|XMLHttpRequest|fetch|Function|console))[A-Za-z0-9]+$/;
+
+const validateInputs = () => {
+  let valid = true;
+  let validationMsg = "";
+
+  // Validate Device ID
+  if (!deviceIdinput.value.trim()) {
+    validationMsg += "Device ID cannot be empty.\n";
+    valid = false;
+    deviceIdinput.style.borderColor = "red";
+  } else if (!deviceIdinput.value.trim().match(deviceIdRegex)) {
+    validationMsg += "Device ID should only contain letters and numbers.\n";
+    valid = false;
+    deviceIdinput.style.borderColor = "red";
+  } else {
+    deviceIdinput.style.borderColor = ""; // Clear error styling
+  }
+
+  // Validate customer ID
+  if (!customerIdSelect.value.trim()) {
+    validationMsg += "customer name cannot be empty.\n";
+    valid = false;
+    customerIdSelect.style.borderColor = "red";
+  } else {
+    customerIdSelect.style.borderColor = ""; // Clear error styling
+  }
+
+  // Display or clear validation message
+  if (validationMsg) {
+    inputValidationMsg.innerText = validationMsg;
+    inputValidationMsg.style.display = "block"; // Show message
+  } else {
+    inputValidationMsg.style.display = "none"; // Hide message if valid
+  }
+
+  return valid;
+};
+
+// Focus on the first invalid field
+const focusOnFirstError = () => {
+  if (deviceIdinput.style.borderColor === "red") {
+    deviceIdinput.focus();
+  } else if (customerIdSelect.style.borderColor === "red") {
+    customerIdSelect.focus();
+  }
+};
+const clearErrorMessages = (event) => {
+  const inputField = event.target;
+  inputField.style.borderColor = ""; // Clear error styling
+  inputValidationMsg.style.display = "none"; // Hide error message
+};
+
+deviceIdinput.addEventListener("input", function (event) {
+  clearErrorMessages(event);
+  // convert each letter to upper case
+  this.value = this.value.toUpperCase();
+});
+customerIdSelect.addEventListener("input", clearErrorMessages);
 class StatusCellRenderer {
   init(params) {
     this.eGui = document.createElement("div");
@@ -78,7 +141,6 @@ async function fetchCustomerData() {
         customerName: item.customer_name,
       }));
       console.log({ arr });
-      const customerIdSelect = document.getElementById("customerId");
 
       customerIdSelect.innerHTML = "";
 
@@ -110,7 +172,6 @@ const onBtnAdd = async () => {
   deviceData.deviceDbId = "";
   deviceData.device_id = "";
   deviceData.customerId = "";
-  const deviceIdinput = document.getElementById("deviceID");
   deviceIdinput.value = "";
   await fetchCustomerData();
 };
@@ -118,8 +179,6 @@ function handleEdit(rowData) {
   isEditing = true;
   addDeviceBtn.innerText = "Update";
   console.log("Edit button clicked for:", rowData, "isEditing:", isEditing);
-  const deviceIdinput = document.getElementById("deviceID");
-
   deviceData.deviceDbId = rowData.id;
   deviceData.device_id = rowData.deviceId;
   deviceData.customerId = rowData.customerName;
@@ -131,6 +190,11 @@ function handleEdit(rowData) {
 const handleSubmit = async (event) => {
   event.preventDefault();
   const authToken = localStorage.getItem("authToken");
+
+  if (!validateInputs()) {
+    focusOnFirstError();
+    return;
+  }
 
   try {
     addDeviceBtn.disabled = true;

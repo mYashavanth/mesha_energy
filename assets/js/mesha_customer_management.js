@@ -7,6 +7,68 @@ const spinnerHTML = `
       <span class="visually-hidden">Loading...</span>
     </div> Please wait...`;
 let gridApi;
+const usernameRegex =
+  /^(?!.*[<>\\/\[\]{};:])(?!.*(script|alert|confirm|prompt|document|window|eval|onload|onerror|innerHTML|setTimeout|setInterval|XMLHttpRequest|fetch|Function|console))[A-Za-z\s-]+$/;
+const addressRegex =
+  /^(?!.*[<>\\/\[\]{};:])(?!.*(script|alert|confirm|prompt|document|window|eval|onload|onerror|innerHTML|setTimeout|setInterval|XMLHttpRequest|fetch|Function|console)).*[A-Za-z0-9\s.,/-]+$/;
+const validateInputs = () => {
+  let valid = true;
+  let validationMsg = "";
+
+  // Validate username
+  if (!customerInput.value.trim()) {
+    validationMsg += "Username cannot be empty.\n";
+    valid = false;
+    customerInput.style.borderColor = "red";
+  } else if (!customerInput.value.trim().match(usernameRegex)) {
+    validationMsg +=
+      "Username should only contain letters, spaces, or hyphens.\n";
+    valid = false;
+    customerInput.style.borderColor = "red";
+  } else {
+    customerInput.style.borderColor = ""; // Clear error styling
+  }
+
+  // validate address
+  if (!companyAddressInput.value.trim()) {
+    validationMsg += "Address cannot be empty.\n";
+    valid = false;
+    companyAddressInput.style.borderColor = "red";
+  } else if (!companyAddressInput.value.trim().match(addressRegex)) {
+    validationMsg += "Address should not contain special characters.\n";
+    valid = false;
+    companyAddressInput.style.borderColor = "red";
+  } else {
+    companyAddressInput.style.borderColor = ""; // Clear error styling
+  }
+
+  // Display or clear validation message
+  if (validationMsg) {
+    inputValidationMsg.innerText = validationMsg;
+    inputValidationMsg.style.display = "block"; // Show message
+  } else {
+    inputValidationMsg.style.display = "none"; // Hide message if valid
+  }
+
+  return valid;
+};
+
+// Focus on the first invalid field
+const focusOnFirstError = () => {
+  if (customerInput.style.borderColor === "red") {
+    customerInput.focus();
+  } else if (companyAddressInput.style.borderColor === "red") {
+    companyAddressInput.focus();
+  }
+};
+const clearErrorMessages = (event) => {
+  const inputField = event.target;
+  inputField.style.borderColor = ""; // Clear error styling
+  inputValidationMsg.style.display = "none"; // Hide error message
+};
+
+customerInput.addEventListener("input", clearErrorMessages);
+companyAddressInput.addEventListener("input", clearErrorMessages);
 class StatusCellRenderer {
   init(params) {
     this.eGui = document.createElement("div");
@@ -82,39 +144,13 @@ function handleEdit(rowData) {
   customerData.CustomerName = rowData.customerName;
   customerData.companyAddress = rowData.companyAddress;
 }
-customerInput.addEventListener("input", () => {
-  inputValidationMsg.style.display = "none";
-  customerInput.style.borderColor = "";
-});
 const handleSubmit = async (event) => {
   event.preventDefault();
   const authToken = localStorage.getItem("authToken");
-  if (customerInput.value.trim() === "") {
-    inputValidationMsg.style.display = "block";
-    inputValidationMsg.innerText = "Customer name cannot be empty.";
-    customerInput.focus();
-    customerInput.style.borderColor = "red";
+  if (!validateInputs()) {
+    focusOnFirstError();
     return;
   }
-
-  if (companyAddressInput.value.trim() === "") {
-    inputValidationMsg.style.display = "block";
-    inputValidationMsg.innerText = "Company address cannot be empty.";
-    companyAddressInput.focus();
-    companyAddressInput.style.borderColor = "red";
-    return;
-  }
-
-  const nameRegex = /^[a-zA-Z\s'-]+$/;
-  if (!nameRegex.test(customerData.CustomerName)) {
-    inputValidationMsg.style.display = "block";
-    inputValidationMsg.innerText =
-      "Please enter a valid customer name (letters, spaces, and hyphens only).";
-    customerInput.focus();
-    customerInput.style.borderColor = "red";
-    return;
-  }
-
   try {
     addCustomerBtn.disabled = true;
     addCustomerBtn.innerHTML = spinnerHTML;
