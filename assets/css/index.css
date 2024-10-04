@@ -7,3 +7,8 @@ body {
   display: flex;
   position: relative;
 }
+#main {
+  width: 84%;
+  padding: 40px;
+  background-color: #f5f6f7;
+}
