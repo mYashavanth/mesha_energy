@@ -41,6 +41,13 @@
     <div id="root">
       <nav id="nav"></nav>
       <main id="main">
+        <div class="mainTopSection">
+          <h1>Mesh Customer Management</h1>
+          <p>
+            View/manage customer profiles and configure interactions for
+            seamless service and engagement.
+          </p>
+        </div>
         <!-- ag-grid table start -->
         <div class="gridTopSection">
           <h1>
@@ -112,7 +119,6 @@
                     id="customerName"
                     placeholder="Enter Customer Name"
                     onchange="handlechange(event)"
-                    required
                   />
                 </div>
                 <div class="modalInput">
@@ -124,7 +130,6 @@
                     id="companyAddress"
                     placeholder="Enter Company Address"
                     onchange="handlechange(event)"
-                    required
                   />
                 </div>
                 <small

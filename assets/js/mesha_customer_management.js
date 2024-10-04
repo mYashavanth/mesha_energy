@@ -85,10 +85,26 @@ function handleEdit(rowData) {
 customerInput.addEventListener("input", () => {
   inputValidationMsg.style.display = "none";
   customerInput.style.borderColor = "";
-})
+});
 const handleSubmit = async (event) => {
   event.preventDefault();
   const authToken = localStorage.getItem("authToken");
+  if (customerInput.value.trim() === "") {
+    inputValidationMsg.style.display = "block";
+    inputValidationMsg.innerText = "Customer name cannot be empty.";
+    customerInput.focus();
+    customerInput.style.borderColor = "red";
+    return;
+  }
+
+  if (companyAddressInput.value.trim() === "") {
+    inputValidationMsg.style.display = "block";
+    inputValidationMsg.innerText = "Company address cannot be empty.";
+    companyAddressInput.focus();
+    companyAddressInput.style.borderColor = "red";
+    return;
+  }
+
   const nameRegex = /^[a-zA-Z\s'-]+$/;
   if (!nameRegex.test(customerData.CustomerName)) {
     inputValidationMsg.style.display = "block";
@@ -166,7 +182,9 @@ async function fetchCustomerData(gridApi) {
 
     const data = await response.json();
 
-    console.log("Customer data:", data);
+    data.errFlag === 1
+      ? (window.location.href = "login.html")
+      : console.log("Customer data:", data);
 
     const formattedData = data.map((item) => ({
       customerName: item.customer_name,
@@ -323,6 +341,7 @@ const gridOptions = {
   paginationPageSize: 10,
   paginationPageSizeSelector: [10, 20, 30],
   suppressExcelExport: true,
+  // enableCellTextSelection: true,
 };
 
 document.addEventListener("DOMContentLoaded", function () {

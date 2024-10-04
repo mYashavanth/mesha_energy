@@ -12,7 +12,13 @@ body {
   padding: 40px;
   background-color: #f5f6f7;
 }
-
+.mainTopSection h1 {
+  font-size: 20px;
+  font-weight: 600;
+}
+.mainTopSection p {
+  font-size: 14px;
+}
 /* switch styling start */
 /* From Uiverse.io by arghyaBiswasDev */
 /* The switch - the box around the slider */
@@ -123,13 +129,13 @@ input:checked + .slider:before {
   box-shadow: none !important;
   border: 1px solid #0d5e36;
 }
-.modal-footer{
+.modal-footer {
   display: flex !important;
   justify-content: space-between !important;
   /* border: 1px solid black !important; */
   padding: 16px 28px !important;
 }
-.modal-footer button{
+.modal-footer button {
   min-width: 100px !important;
 }
 

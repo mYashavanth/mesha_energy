@@ -65,7 +65,7 @@ function loadNavBar() {
         <i class="bi bi-gear" style="font-size: 20px"></i>
         <p>Settings</p>
       </div>
-      <div class="navItems" id="profile-link">
+      <div class="navItems" id="profile_link">
         <i class="bi bi-person" style="font-size: 20px"></i>
         <p>Profile</p>
       </div>
@@ -114,6 +114,11 @@ function loadNavBar() {
     .addEventListener("click", function () {
       window.location.href = "/super_user_role_management.html";
     });
+  document
+    .getElementById("profile_link")
+    .addEventListener("click", function () {
+      window.location.href = "/profile.html";
+    });
 }
 
 function setActiveLink() {
@@ -129,7 +134,7 @@ function setActiveLink() {
     "/super_user_role_management.html": "super_user_role_management_link",
     "/map-view": "map-view-link",
     "/settings": "settings-link",
-    "/profile": "profile-link",
+    "/profile.html": "profile_link",
     "/faqs": "faqs-link",
   };
 

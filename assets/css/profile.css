@@ -1,0 +1,50 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Public Sans", sans-serif !important;
+}
+#root {
+  display: flex;
+  position: relative;
+}
+#main {
+  width: 84%;
+  padding: 40px;
+  background-color: #f5f6f7;
+}
+.mainTopSection h1 {
+  font-size: 20px;
+  font-weight: 600;
+}
+.mainTopSection p {
+  font-size: 14px;
+}
+/* .mainContent {
+  border: 1px solid black;
+} */
+.changePassword {
+  /* border: 1px solid black; */
+  width: 508px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+}
+.changePasswordHeader h1 {
+  font-size: 20px;
+  font-weight: 600;
+  border-bottom: 1px solid lightgray;
+  padding: 20px;
+}
+.changePasswordContent {
+  padding: 20px;
+}
+.formData {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.formData button {
+  width: fit-content;
+  margin-left: auto;
+}

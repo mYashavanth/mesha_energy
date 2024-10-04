@@ -154,7 +154,9 @@ async function fetchSuperAdminUsers(gridApi) {
 
     const data = await response.json();
 
-    console.log("Customer data:", data);
+    data.errFlag === 1
+      ? (window.location.href = "login.html")
+      : console.log("Super admin data:", data);
 
     const formattedData = data.map((item) => ({
       userName: item.username,
@@ -299,6 +301,7 @@ const gridOptions = {
   paginationPageSize: 10,
   paginationPageSizeSelector: [10, 20, 30],
   suppressExcelExport: true,
+  // enableCellTextSelection: true,
 };
 
 document.addEventListener("DOMContentLoaded", function () {
