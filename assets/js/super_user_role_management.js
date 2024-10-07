@@ -372,6 +372,10 @@ const gridOptions = {
       debounceMs: 0,
       buttons: ["reset"],
     },
+    cellClassRules: {
+      "disabled-cell": (params) =>
+        params.data.email === localStorage.getItem("userEmail"),
+    },
   },
   domLayout: "autoHeight",
   getRowHeight: function (params) {
