@@ -390,3 +390,17 @@ document.addEventListener("DOMContentLoaded", function () {
 function onBtnExport() {
   gridApi.exportDataAsCsv();
 }
+// function onBtnExport() {
+//   gridApi.exportDataAsCsv({
+//     processCellCallback: (params) => {
+//       if (params.column.getColId() === "status") {
+//         return params.value === 1
+//           ? "Active"
+//           : params.value === 0
+//           ? "Inactive"
+//           : params.value;
+//       }
+//       return params.value;
+//     },
+//   });
+// }
