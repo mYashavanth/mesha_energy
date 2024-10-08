@@ -315,8 +315,16 @@ async function toggleStatus(diviceDbId, newStatus) {
     return false;
   } catch (error) {
     console.error("Error updating customer status:", error);
+    triggerErrorToast("Please check your internet connection and try again.");
     return false;
   }
+}
+function triggerErrorToast(message) {
+  const toastElement = document.getElementById("errorToast");
+  const toastMessageElement = document.getElementById("toastMessage");
+  toastMessageElement.textContent = message;
+  const toast = new bootstrap.Toast(toastElement);
+  toast.show();
 }
 
 const gridOptions = {
@@ -419,5 +427,16 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function onBtnExport() {
-  gridApi.exportDataAsCsv();
+  gridApi.exportDataAsCsv({
+    processCellCallback: (params) => {
+      if (params.column.getColId() === "status") {
+        return params.value === 1
+          ? "Active"
+          : params.value === 0
+          ? "Inactive"
+          : params.value;
+      }
+      return params.value;
+    },
+  });
 }
