@@ -44,6 +44,11 @@ figure img {
 .navItems i {
   color: #626c70;
 }
+.navItems:hover p,
+.navItems:hover i {
+  color: #0d5e36;
+  font-weight: 500;
+}
 .navItems.active i {
   color: #0d5e36;
   font-weight: bold;

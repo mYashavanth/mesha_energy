@@ -17,12 +17,12 @@ const validateInputs = () => {
 
   // Validate username
   if (!customerInput.value.trim()) {
-    validationMsg += "Username cannot be empty.\n";
+    validationMsg += "Customer name cannot be empty.\n";
     valid = false;
     customerInput.style.borderColor = "red";
   } else if (!customerInput.value.trim().match(usernameRegex)) {
     validationMsg +=
-      "Username should only contain letters, spaces, or hyphens.\n";
+      "Customer name should only contain letters, spaces, or hyphens.\n";
     valid = false;
     customerInput.style.borderColor = "red";
   } else {

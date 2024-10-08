@@ -12,7 +12,7 @@ function loadNavBar() {
         <i class="bi bi-person-workspace" style="font-size: 20px"></i>
         <p>Mesha Customer Management</p>
       </div>
-      <div class="accordion" id="accordionExample">
+      <!-- <div class="accordion" id="accordionExample">
         <div class="accordion-item">
           <h2 class="accordion-header">
             <button
@@ -48,22 +48,22 @@ function loadNavBar() {
             </div>
           </div>
         </div>
+      </div> -->
+      <div class="navItems" id="device_management-link">
+        <i class="bi bi-ev-front" style="font-size: 20px"></i>
+        <p>Device Management</p>
       </div>
       <div class="navItems" id="user_role_management_link">
         <i class="bi bi-people" style="font-size: 20px;" ></i>
         <p>User Role Management</p>
       </div>
       <div class="navItems" id="super_user_role_management_link">
-        <i class="bi bi-people" style="font-size: 20px;" ></i>
+        <i class="bi bi-person-gear" style="font-size: 20px;" ></i>
         <p>Super User Role Management</p>
       </div>
       <div class="navItems" id="map-view-link">
         <i class="bi bi-pin-map" style="font-size: 20px"></i>
         <p>Map View</p>
-      </div>
-      <div class="navItems" id="settings-link">
-        <i class="bi bi-gear" style="font-size: 20px"></i>
-        <p>Settings</p>
       </div>
       <div class="navItems" id="profile_link">
         <i class="bi bi-person" style="font-size: 20px"></i>
@@ -133,7 +133,6 @@ function setActiveLink() {
     "/user_role_management.html": "user_role_management_link",
     "/super_user_role_management.html": "super_user_role_management_link",
     "/map-view": "map-view-link",
-    "/settings": "settings-link",
     "/profile.html": "profile_link",
     "/faqs": "faqs-link",
   };
@@ -148,7 +147,7 @@ function setActiveLink() {
   }
 
   // Check if any of the accordion links are active and open the accordion if needed
-  const accordionLinks = ["/device_management.html", "/device_parameters.html"];
+  const accordionLinks = ["/example.html", "/device_parameters.html"];
   const isAccordionActive = accordionLinks.includes(path);
 
   if (isAccordionActive) {
