@@ -49,13 +49,13 @@ function loadNavBar() {
           </div>
         </div>
       </div> -->
+      <div class="navItems" id="customer_user_role_management_link">
+        <i class="bi bi-people" style="font-size: 20px;" ></i>
+        <p>Customer User Role Management</p>
+      </div>
       <div class="navItems" id="device_management-link">
         <i class="bi bi-ev-front" style="font-size: 20px"></i>
         <p>Device Management</p>
-      </div>
-      <div class="navItems" id="user_role_management_link">
-        <i class="bi bi-people" style="font-size: 20px;" ></i>
-        <p>User Role Management</p>
       </div>
       <div class="navItems" id="super_user_role_management_link">
         <i class="bi bi-person-gear" style="font-size: 20px;" ></i>
@@ -105,9 +105,9 @@ function loadNavBar() {
       window.location.href = "/device_management.html";
     });
   document
-    .getElementById("user_role_management_link")
+    .getElementById("customer_user_role_management_link")
     .addEventListener("click", function () {
-      window.location.href = "/user_role_management.html";
+      window.location.href = "/customer_user_role_management.html";
     });
   document
     .getElementById("super_user_role_management_link")
@@ -130,7 +130,7 @@ function setActiveLink() {
     "/mesha_customer_management.html": "mesha_customer_management_link",
     "/customer-management": "customer_management_link",
     "/device_management.html": "device_management-link",
-    "/user_role_management.html": "user_role_management_link",
+    "/customer_user_role_management.html": "customer_user_role_management_link",
     "/super_user_role_management.html": "super_user_role_management_link",
     "/map-view": "map-view-link",
     "/profile.html": "profile_link",
