@@ -76,7 +76,7 @@ class StatusCellRenderer {
 
     this.eGui.innerHTML = `
       <label class="switch">
-        <input type="checkbox" class="checkbox" ${isChecked}>
+        <input id=${params.data.customerId} type="checkbox" class="checkbox" ${isChecked}>
         <div class="slider"></div>
       </label>`;
 
