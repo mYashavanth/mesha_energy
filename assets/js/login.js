@@ -105,11 +105,11 @@ async function handleSubmit(event) {
     );
 
     const data = await response.json();
-
+    console.log("Response:", data);
     if (data.errFlag === 0) {
       localStorage.setItem("authToken", data.token);
       localStorage.setItem("userEmail", loginData.email);
-      window.location.href = "mesha_customer_management.html";
+      window.location.href = "index.html";
     } else {
       inputValidationMsg.textContent = data.message + " Please try again.";
       inputValidationMsg.style.display = "block";

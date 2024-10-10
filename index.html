@@ -113,41 +113,126 @@
           </div>
         </div> -->
       </nav>
-      <main id="main" style="height: 100vh">
-        <h1>Dashboard</h1>
+      <main id="main">
+        <div class="topSection">
+          <h1>Device Parameters</h1>
+          <p>View detailed device parameters for multiple data points</p>
+        </div>
+        <div id="deviceIdData">
+          <div class="customerName">
+            <p>Customer Name:</p>
+            <p id="customerName">Liveguard</p>
+          </div>
+          <div class="vr" style="height: 25px; width: 2px"></div>
+          <div class="deviceId">
+            <p>Device ID:</p>
+            <select name="deviceId" id="deviceId"></select>
+          </div>
+          <div class="vr" style="height: 25px; width: 2px"></div>
+          <div class="dateAndTime">
+            <p>Date and Time:</p>
+            <p id="date">--/--/----</p>
+            <p id="time">00:00</p>
+          </div>
+        </div>
+        <div id="deviceDataCardContainer">
+          <!-- voltage 1 card -->
+          <div class="deviceDataCard">
+            <div class="deviceDataCardContent">
+              <p>VOLTAGE 1 (B1)</p>
+              <h1 id="voltage1">0.00</h1>
+            </div>
+            <div class="deviceDataCardImg" style="background-color: #feffde">
+              <img src="./assets/images/index/voltage.svg" alt="voltage" />
+            </div>
+          </div>
+          <!-- voltage 2 card -->
+          <div class="deviceDataCard">
+            <div class="deviceDataCardContent">
+              <p>VOLTAGE 2 (B2)</p>
+              <h1 id="voltage2">0.00</h1>
+            </div>
+            <div class="deviceDataCardImg" style="background-color: #feffde">
+              <img src="./assets/images/index/voltage.svg" alt="voltage" />
+            </div>
+          </div>
+          <!-- voltage 3 card -->
+          <div class="deviceDataCard">
+            <div class="deviceDataCardContent">
+              <p>VOLTAGE 3 (B3)</p>
+              <h1 id="voltage3">0.00</h1>
+            </div>
+            <div class="deviceDataCardImg" style="background-color: #feffde">
+              <img src="./assets/images/index/voltage.svg" alt="voltage" />
+            </div>
+          </div>
+          <!-- voltage 4 card -->
+          <div class="deviceDataCard">
+            <div class="deviceDataCardContent">
+              <p>VOLTAGE 4 (B4)</p>
+              <h1 id="voltage4">0.00</h1>
+            </div>
+            <div class="deviceDataCardImg" style="background-color: #feffde">
+              <img src="./assets/images/index/voltage.svg" alt="voltage" />
+            </div>
+          </div>
+          <!-- battery bank voltage -->
+          <div class="deviceDataCard">
+            <div class="deviceDataCardContent">
+              <p>BATTERY BANK VOLTAGE</p>
+              <h1 id="batteryBankVoltage">0.00</h1>
+            </div>
+            <div class="deviceDataCardImg" style="background-color: #feffde">
+              <img src="./assets/images/index/voltage.svg" alt="voltage" />
+            </div>
+          </div>
+          <!-- current card -->
+          <div class="deviceDataCard">
+            <div class="deviceDataCardContent">
+              <p>CURRENT (A)</p>
+              <h1 id="current">0.00</h1>
+            </div>
+            <div
+              class="deviceDataCardImg"
+              style="background-color: #ecfff6; padding: 20px 24px"
+            >
+              <img src="./assets/images/index/current.svg" alt="current" />
+            </div>
+          </div>
+          <!-- temperature card -->
+          <div class="deviceDataCard">
+            <div class="deviceDataCardContent">
+              <p>TEMPERATURE (C)</p>
+              <h1 id="temperature">0.00</h1>
+            </div>
+            <div class="deviceDataCardImg" style="background-color: #fff3e2">
+              <img src="./assets/images/index/temperature.svg" alt="temp" />
+            </div>
+          </div>
+          <!-- speed card -->
+          <div class="deviceDataCard">
+            <div class="deviceDataCardContent">
+              <p>SPEED (KM/H)</p>
+              <h1 id="speed">0.00</h1>
+            </div>
+            <div class="deviceDataCardImg" style="background-color: #f5f6f7">
+              <img src="./assets/images/index/speed.svg" alt="speed" />
+            </div>
+          </div>
+          <!-- distance card -->
+          <div class="deviceDataCard">
+            <div class="deviceDataCardContent">
+              <p>DISTANCE (KM)</p>
+              <h1 id="distance">0.00</h1>
+            </div>
+            <div class="deviceDataCardImg" style="background-color: #e0ffd9">
+              <img src="./assets/images/index/distance.svg" alt="distance" />
+            </div>
+          </div>
+        </div>
       </main>
     </div>
   </body>
 </html>
 <script src="./assets/js/navbar.js"></script>
-<script>
-  async function fetchCustomerData() {
-    const authToken = localStorage.getItem("authToken");
-    const apiUrl = `https://stingray-app-4smpo.ondigitalocean.app/customers/all/${authToken}`;
-
-    try {
-      const response = await fetch(apiUrl, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      data.errFlag === 1
-        ? (window.location.href = "login.html")
-        : console.log("Customer data:", data);
-    } catch (error) {
-      console.error("Error fetching customer data:", error);
-      window.location.href = "login.html";
-    }
-  }
-  document.addEventListener("DOMContentLoaded", function () {
-    fetchCustomerData();
-  });
-</script>
+<script src="./assets/js/index.js"></script>
