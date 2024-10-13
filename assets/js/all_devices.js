@@ -176,7 +176,9 @@ const gridOptions = {
     {
       headerName: "Status",
       field: "status",
-      maxWidth: 100,
+      filter: false,
+      sortable: false,
+      maxWidth: 90,
       cellRenderer: () => {
         return `<span style="color: green; font-weight: bold; border: 1px solid green; padding: 5px; border-radius: 5px; background-color: rgb(213, 255, 213)">Active</span>`;
       },
@@ -206,7 +208,7 @@ const gridOptions = {
     {
       headerName: "Bank Voltage",
       field: "bankVoltage",
-      maxWidth: 80,
+      maxWidth: 140,
     },
     {
       headerName: "A",
@@ -216,6 +218,7 @@ const gridOptions = {
     {
       headerName: "Distance",
       field: "deviceId",
+      maxWidth: 130,
       cellRenderer: (params) => {
         const cellDiv = document.createElement("div");
         cellDiv.innerHTML = "Loading...";
@@ -258,30 +261,63 @@ const gridOptions = {
     {
       headerName: "Date & Time",
       field: "deviceLogDate",
-      valueGetter: (params) => {
-        // Format date and time in dd/mm/yyyy - time
+      cellRenderer: (params) => {
         const date = params.data.deviceLogDate;
         const time = params.data.time;
-        return `${date} - ${time}`;
+        // Use <br> for a line break between date and time
+        return `${date} <br> ${time}`;
+      },
+      filter: "agDateColumnFilter",
+      filterParams: {
+        comparator: (filterLocalDateAtMidnight, cellValue) => {
+          const date = cellValue.split(" <br> ")[0]; // Extract date part only for comparison
+          const dateParts = date.split("/");
+          const day = Number(dateParts[0]);
+          const month = Number(dateParts[1]) - 1;
+          const year = Number(dateParts[2]);
+          const cellDate = new Date(year, month, day);
+
+          if (cellDate < filterLocalDateAtMidnight) {
+            return -1;
+          } else if (cellDate > filterLocalDateAtMidnight) {
+            return 1;
+          } else {
+            return 0;
+          }
+        },
       },
     },
     {
       headerName: "Location",
       field: "location",
+      filter: false,
+      sortable: false,
       maxWidth: 100,
       cellRenderer: (params) => {
         const lat = params.data.lat;
         const long = params.data.long;
-        return `<button onclick="consoleLocation(${lat}, ${long})">View</button>`;
+        return `<button 
+              type="button"
+              class="btn btn-outline-success mt-2"
+              onclick="openMapModal(${lat}, ${long})"
+            >View</button>`;
       },
     },
     {
       headerName: "Action",
       field: "action",
+      filter: false,
+      sortable: false,
       maxWidth: 100,
       cellRenderer: (params) => {
         const deviceId = params.data.deviceId;
-        return `<button onclick="consoleDeviceId('${deviceId}')">Action</button>`;
+        return `<button
+                  type="button"
+                  class="btn btn-light mt-2"
+                  onclick="consoleDeviceId('${deviceId}')"
+                >
+                <i class="bi bi-download"></i>
+                </button>`;
       },
     },
   ],
@@ -289,7 +325,7 @@ const gridOptions = {
   defaultColDef: {
     sortable: true,
     filter: "agTextColumnFilter",
-    floatingFilter: true,
+    // floatingFilter: true,
     flex: 1,
     filterParams: {
       debounceMs: 0,
@@ -304,10 +340,37 @@ const gridOptions = {
   paginationPageSize: 10,
   paginationPageSizeSelector: [10, 20, 30],
 };
+function openMapModal(lat, lng) {
+  const mapModal = new bootstrap.Modal(document.getElementById("mapModal"));
 
-// Helper functions for button actions
-function consoleLocation(lat, long) {
-  console.log("Latitude:", lat, "Longitude:", long);
+  mapModal.show();
+
+  document.getElementById("mapModal").addEventListener(
+    "shown.bs.modal",
+    function () {
+      initMap(lat, lng);
+    },
+    { once: true }
+  );
+}
+function initMap(lat, lng) {
+  const location = { lat: lat, lng: lng };
+
+  const map = new google.maps.Map(document.getElementById("map"), {
+    zoom: 15,
+    center: location,
+  });
+
+  const icon = {
+    url: "https://i.postimg.cc/76gy7c3M/auto.png",
+    scaledSize: new google.maps.Size(48, 48),
+  };
+
+  const marker = new google.maps.Marker({
+    position: location,
+    map: map,
+    icon: icon,
+  });
 }
 
 function consoleDeviceId(deviceId) {

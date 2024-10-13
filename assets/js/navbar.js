@@ -61,9 +61,9 @@ function loadNavBar() {
         <i class="bi bi-person-gear" style="font-size: 20px;" ></i>
         <p>Super User Role Management</p>
       </div>
-      <div class="navItems" id="map_view_link">
+      <div class="navItems" id="all_devices_link">
         <i class="bi bi-pin-map" style="font-size: 20px"></i>
-        <p>Map View</p>
+        <p>All Devices</p>
       </div>
       <div class="navItems" id="profile_link">
         <i class="bi bi-person" style="font-size: 20px"></i>
@@ -121,9 +121,9 @@ function loadNavBar() {
       window.location.href = "/profile.html";
     });
   document
-    .getElementById("map_view_link")
+    .getElementById("all_devices_link")
     .addEventListener("click", function () {
-      window.location.href = "/map_view.html";
+      window.location.href = "/all_devices.html";
     });
 }
 
@@ -138,7 +138,7 @@ function setActiveLink() {
     "/device_management.html": "device_management-link",
     "/customer_user_role_management.html": "customer_user_role_management_link",
     "/super_user_role_management.html": "super_user_role_management_link",
-    "/map_view.html": "map_view_link",
+    "/all_devices.html": "all_devices_link",
     "/profile.html": "profile_link",
     "/faqs": "faqs-link",
   };
