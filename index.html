@@ -29,6 +29,8 @@
       href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,100..900;1,100..900&display=swap"
       rel="stylesheet"
     />
+    <!-- ag-chart -->
+    <script src="https://cdn.jsdelivr.net/npm/ag-charts-community/dist/umd/ag-charts-community.js"></script>
   </head>
   <body>
     <script
@@ -230,8 +232,95 @@
             </div>
           </div>
         </div>
+
+        <div id="myChart"></div>
       </main>
     </div>
+    <script>
+      // Fake data generation
+      const data = [
+        { time: "0 min", current: 10, voltage: 50, temperature: 20 },
+        { time: "1 min", current: 25, voltage: 65, temperature: 22 },
+        { time: "2 min", current: 30, voltage: 55, temperature: 24 },
+        { time: "3 min", current: 20, voltage: 45, temperature: 21 },
+        { time: "4 min", current: 35, voltage: 70, temperature: 29 },
+        { time: "5 min", current: 25, voltage: 60, temperature: 28 },
+        { time: "6 min", current: 15, voltage: 50, temperature: 35 },
+        { time: "7 min", current: 5, voltage: 65, temperature: 38 },
+        { time: "8 min", current: 35, voltage: 55, temperature: 32 },
+        { time: "9 min", current: 45, voltage: 50, temperature: 30 },
+        { time: "10 min", current: 35, voltage: 80, temperature: 28 },
+        { time: "11 min", current: 20, voltage: 60, temperature: 15 },
+      ];
+
+      // Configuration for the chart
+      const options = {
+        container: document.getElementById("myChart"),
+        height: 600, // Set your desired height
+        title: {
+          text: "Current, Voltage, and Temperature vs Time",
+          fontSize: 18,
+        },
+        data: data,
+        series: [
+          {
+            type: "line",
+            xKey: "time",
+            yKey: "current",
+            stroke: "#ff0000", // Red for current
+            strokeWidth: 3,
+            marker: { enabled: true },
+            title: "Current",
+            interpolation: { type: "smooth" },
+          },
+          {
+            type: "line",
+            xKey: "time",
+            yKey: "voltage",
+            stroke: "#00ff00", // Green for voltage
+            strokeWidth: 3,
+            marker: { enabled: true },
+            title: "Voltage",
+            interpolation: { type: "smooth" },
+          },
+          {
+            type: "line",
+            xKey: "time",
+            yKey: "temperature",
+            stroke: "#0000ff", // Blue for temperature
+            strokeWidth: 3,
+            marker: { enabled: true },
+            title: "Temperature",
+            interpolation: { type: "smooth" },
+          },
+        ],
+        axes: [
+          {
+            type: "category",
+            position: "bottom",
+            title: {
+              text: "Time",
+            },
+            label: {
+              rotation: 60, // Rotate labels if necessary
+            },
+          },
+          {
+            type: "number",
+            position: "left",
+            title: {
+              text: "Values",
+            },
+          },
+        ],
+        legend: {
+          position: "bottom",
+        },
+      };
+
+      // Render the chart
+      agCharts.AgCharts.create(options);
+    </script>
   </body>
 </html>
 <script src="./assets/js/navbar.js"></script>

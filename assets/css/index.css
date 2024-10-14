@@ -49,7 +49,7 @@ body {
   font-size: 16px;
   font-weight: 500;
   height: 30px;
-  background-color: #EFEFEF;
+  background-color: #efefef;
   border-radius: 4px;
   padding: 0 8px;
 }
@@ -72,7 +72,8 @@ body {
   padding: 24px;
   background-color: white;
   border-radius: 8px;
-  box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px,
+    rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
 }
 .deviceDataCardContent {
   /* border: 1px solid black; */
@@ -93,4 +94,12 @@ body {
   padding: 20px;
   border-radius: 50%;
   background-color: #ecfff6;
+}
+#myChart {
+  margin: 24px;
+  border-radius: 8px;
+  overflow: hidden;
+  /* border: 1px solid black; */
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px,
+    rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
 }
