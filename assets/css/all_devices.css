@@ -55,6 +55,9 @@
   display: flex;
   gap: 16px;
 }
+#dateModal .modal-footer .dropdown {
+  cursor: pointer;
+}
 #clearDateRange {
   position: absolute;
   top: 12px;
