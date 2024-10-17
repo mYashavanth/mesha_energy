@@ -32,6 +32,15 @@
     />
     <!-- ag-grid -->
     <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
+    <!-- Flatpickr CSS with Material Green Theme -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_green.css"
+      rel="stylesheet"
+    />
   </head>
   <body>
     <script
@@ -39,6 +48,8 @@
       integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
       crossorigin="anonymous"
     ></script>
+    <!-- Flatpickr -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <div id="root">
       <nav id="nav"></nav>
       <main id="main">
@@ -48,17 +59,29 @@
         </div>
         <!-- ag-grid table start -->
         <div class="gridTopSection">
-          <h1>
-            <i
-              class="bi bi-person-badge"
-              style="font-size: 20px; margin-right: 16px"
-            ></i
-            >Device Diagnostics
-          </h1>
-          <div class="allDevicesCustomerName">
-            <p>Customer Name:</p>
-            <select name="customerId" id="customerId"></select>
+          <div class="customerName">
+            <h1>
+              <i
+                class="bi bi-person-badge"
+                style="font-size: 20px; margin-right: 16px"
+              ></i
+              >Device Diagnostics
+            </h1>
+            <div class="vr" style="height: 25px; width: 4px"></div>
+            <div class="allDevicesCustomerName">
+              <p>Customer Name:</p>
+              <select name="customerId" id="customerId"></select>
+            </div>
           </div>
+          <!-- Button to trigger modal -->
+          <button
+            type="button"
+            class="btn btn-success"
+            data-bs-toggle="modal"
+            data-bs-target="#dateModal"
+          >
+            <i class="bi bi-database-down"></i> Download CSV Report
+          </button>
         </div>
 
         <div id="myGrid" class="ag-theme-quartz" style="width: 100%"></div>
@@ -101,6 +124,114 @@
         </div>
       </div>
       <!-- mapModal end -->
+
+      <!-- dateModal Start -->
+      <!-- Updated Modal with Increased Width -->
+      <div
+        class="modal fade"
+        id="dateModal"
+        tabindex="-1"
+        aria-labelledby="dateModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+          <!-- Increased width with modal-lg -->
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="dateModalLabel">
+                Download CSV Report
+              </h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <div class="row">
+                <!-- ID Selection First -->
+                <div class="col-md-4">
+                  <label for="deviceId" class="form-label"
+                    >Select Device ID</label
+                  >
+                  <select
+                    name="deviceId"
+                    id="deviceId"
+                    class="form-select"
+                  ></select>
+                </div>
+
+                <!-- Calendar Selection for Date Range -->
+                <div class="col-md-8 calendar-container">
+                  <label for="dateRange" class="form-label">Date Range</label>
+                  <input
+                    type="text"
+                    id="dateRange"
+                    class="form-control flatpickr"
+                  />
+                  <!-- Clear Date Range Button -->
+                  <div class="mt-2">
+                    <button
+                      type="button"
+                      id="clearDateRange"
+                      class="btn btn-outline-secondary"
+                    >
+                      Clear Date
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <small id="inputValidationMsg" class="text-danger"></small>
+            </div>
+
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+                id="dateModatCancel"
+              >
+                Cancel
+              </button>
+              <!-- <div>
+                <button type="button" class="btn btn-success" id="download1">
+                  <i class="bi bi-file-earmark-arrow-down"></i> Date Range
+                </button>
+                <button type="button" class="btn btn-success" id="download2">
+                  <i class="bi bi-file-earmark-arrow-down"></i> Charging and
+                  Discharging
+                </button>
+              </div> -->
+              <div class="dropdown">
+                <button
+                  class="btn btn-success dropdown-toggle"
+                  type="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  Dropdown CSV
+                </button>
+                <ul class="dropdown-menu dropdown-menu-light">
+                  <li>
+                    <a class="dropdown-item" id="download1"
+                      ><i class="bi bi-file-earmark-arrow-down"></i> Date
+                      Range</a
+                    >
+                  </li>
+                  <li>
+                    <a class="dropdown-item" id="download2"
+                      ><i class="bi bi-file-earmark-arrow-down"></i> Charging
+                      and Discharging</a
+                    >
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- dateModal end -->
     </div>
   </body>
 </html>

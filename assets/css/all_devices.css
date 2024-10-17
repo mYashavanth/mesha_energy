@@ -1,10 +1,24 @@
+.customerName {
+  /* border: 1px solid black; */
+  display: flex;
+  gap: 24px;
+}
+.customerName h1{
+  width: 100%;
+  margin: 0;
+}
 .allDevicesCustomerName {
+  /* border: 1px solid black; */
+  width: 100%;
   display: flex;
   gap: 8px;
 }
 .allDevicesCustomerName p {
   font-size: 18px;
   font-weight: 500;
+  width: 150px;
+  margin: 0;
+  /* border: 1px solid black; */
 }
 .allDevicesCustomerName select {
   border: none;
@@ -15,4 +29,34 @@
   background-color: #efefef;
   border-radius: 4px;
   padding: 0 8px;
+}
+.csvDownload {
+  /* border: 1px solid black; */
+  padding: 24px;
+  display: flex;
+  justify-content: flex-end;
+  background-color: white;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+#dateModal .modal-header {
+  /* border: 1px solid black; */
+  padding: 24px;
+}
+#dateModal .modal-body {
+  /* border: 1px solid black; */
+  padding: 24px;
+}
+#dateModal .modal-footer {
+  /* border: 1px solid black; */
+  padding: 24px !important;
+}
+#dateModal .modal-footer div {
+  display: flex;
+  gap: 16px;
+}
+#clearDateRange {
+  position: absolute;
+  top: 12px;
+  right: 24px;
 }

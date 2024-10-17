@@ -376,3 +376,155 @@ function initMap(lat, lng) {
 function consoleDeviceId(deviceId) {
   console.log("Device ID:", deviceId);
 }
+
+document.addEventListener("DOMContentLoaded", async function () {
+  const deviceIdSelect = document.getElementById("deviceId");
+
+  let deviceIdDetais = await fetchDeviceData();
+  if (deviceIdDetais) {
+    console.log("deviceIdDetais", deviceIdDetais);
+
+    deviceIdDetais.forEach((device) => {
+      const option = document.createElement("option");
+      option.value = device.device_id;
+      option.text = device.device_id;
+      deviceIdSelect.appendChild(option);
+    });
+
+    const storedDeviceId = localStorage.getItem("selectedDeviceId");
+    if (
+      storedDeviceId &&
+      deviceIdDetais.some((device) => device.device_id === storedDeviceId)
+    ) {
+      deviceIdSelect.value = storedDeviceId;
+    } else {
+      deviceIdSelect.value = deviceIdDetais[0].device_id;
+      localStorage.setItem("selectedDeviceId", deviceIdDetais[0].device_id);
+    }
+
+    deviceIdSelect.addEventListener("change", async function () {
+      const selectedDeviceId = this.value;
+      localStorage.setItem("selectedDeviceId", selectedDeviceId);
+    });
+  }
+});
+async function fetchDeviceData() {
+  const authToken = localStorage.getItem("authToken");
+  const apiUrl = `https://stingray-app-4smpo.ondigitalocean.app/device-masters/all/${authToken}`;
+
+  try {
+    const response = await fetch(apiUrl, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (data.errFlag === 1) {
+      window.location.href = "login.html";
+      return null;
+    } else {
+      console.log("device data:", data);
+      return data;
+    }
+  } catch (error) {
+    console.error("Error fetching device data:", error);
+    window.location.href = "login.html";
+    return null;
+  }
+}
+const errorMsg = document.getElementById("inputValidationMsg");
+let selectedDates = [];
+
+// Initialize Flatpickr for range selection with a 10-day limit
+flatpickr("#dateRange", {
+  mode: "range",
+  inline: true,
+  dateFormat: "Y-m-d",
+  theme: "material_green",
+  onChange: function (dates) {
+    // Limit the range to 10 days
+    if (dates.length === 2) {
+      const diff = Math.ceil((dates[1] - dates[0]) / (1000 * 60 * 60 * 24));
+      if (diff > 30) {
+        // alert("Please select a range of up to 10 days.");
+        errorMsg.textContent = "Please select a range of up to 30 days.";
+        toClearErrorMsg();
+        this.clear(); // Clears the selected dates
+      }
+    }
+    selectedDates = dates;
+  },
+});
+
+// Function to format date as YYYY-MM-DD in local time zone
+function formatDateToLocal(date) {
+  const year = date.getFullYear();
+  const month = ("0" + (date.getMonth() + 1)).slice(-2); // Month is zero-indexed
+  const day = ("0" + date.getDate()).slice(-2);
+  return `${year}-${month}-${day}`;
+}
+var errorTimeout;
+function toClearErrorMsg() {
+  clearTimeout(errorTimeout)
+  errorTimeout =  setTimeout(() => {
+    errorMsg.textContent = "";
+  }, 5000);
+}
+
+// Function to handle the download
+function handleDownload(downloadType) {
+  const selectedId = document.getElementById("deviceId").value;
+  const authToken = localStorage.getItem("authToken");
+
+  if (selectedDates.length === 2 && selectedId && authToken) {
+    const fromDate = formatDateToLocal(selectedDates[0]);
+    const toDate = formatDateToLocal(selectedDates[1]);
+
+    let downloadUrl = "";
+
+    // Determine the URL based on the button clicked (1 for Date Range, 2 for Charging/Discharging)
+    if (downloadType === 1) {
+      downloadUrl = `https://stingray-app-4smpo.ondigitalocean.app/download/csv/date-range/${selectedId}/${fromDate}/${toDate}/${authToken}`;
+    } else if (downloadType === 2) {
+      downloadUrl = `https://stingray-app-4smpo.ondigitalocean.app/download/charge_discharge/csv/date-range/${selectedId}/${fromDate}/${toDate}/${authToken}`;
+    }
+
+    // Create a hidden anchor element and trigger the download
+    const anchor = document.createElement("a");
+    anchor.href = downloadUrl;
+    anchor.download = "report.csv"; // The filename can be customized if needed
+    document.body.appendChild(anchor);
+    anchor.click();
+    document.body.removeChild(anchor);
+  } else {
+    // alert("Please select a date range, ID, and ensure you're authenticated.");
+    errorMsg.textContent =
+      "Please select a Device ID, Date Range, and ensure you're Authenticated.";
+    toClearErrorMsg();
+  }
+}
+
+// Attach event listeners for the download buttons
+document.getElementById("download1").addEventListener("click", function () {
+  handleDownload(1); // Date Range Report
+});
+document.getElementById("download2").addEventListener("click", function () {
+  handleDownload(2); // Charging and Discharging Report
+});
+
+// Clear date range button functionality
+document.getElementById("clearDateRange").addEventListener("click", () => {
+  document.getElementById("dateRange")._flatpickr.clear();
+  selectedDates = [];
+});
+document.getElementById("dateModatCancel").addEventListener("click", () => {
+  document.getElementById("dateRange")._flatpickr.clear();
+  selectedDates = [];
+});
