@@ -314,7 +314,9 @@ const gridOptions = {
         return `<button
                   type="button"
                   class="btn btn-light mt-2"
-                  onclick="consoleDeviceId('${deviceId}')"
+                  data-bs-toggle="modal"
+                  data-bs-target="#dateModal"
+                  onclick="setDeviceId('${deviceId}')"
                 >
                 <i class="bi bi-download"></i>
                 </button>`;
@@ -373,8 +375,10 @@ function initMap(lat, lng) {
   });
 }
 
-function consoleDeviceId(deviceId) {
+function setDeviceId(deviceId) {
   console.log("Device ID:", deviceId);
+  document.getElementById("deviceId").value = deviceId;
+  localStorage.setItem("selectedDeviceId", deviceId);
 }
 
 document.addEventListener("DOMContentLoaded", async function () {
@@ -472,8 +476,8 @@ function formatDateToLocal(date) {
 }
 var errorTimeout;
 function toClearErrorMsg() {
-  clearTimeout(errorTimeout)
-  errorTimeout =  setTimeout(() => {
+  clearTimeout(errorTimeout);
+  errorTimeout = setTimeout(() => {
     errorMsg.textContent = "";
   }, 5000);
 }
