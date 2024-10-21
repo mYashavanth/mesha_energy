@@ -164,7 +164,7 @@ async function fetchDeviceDetails(deviceId) {
     }
 
     if (distanceData.length > 0) {
-      distance.textContent = distanceData[0].distance_in_kms;
+      distance.textContent = distanceData[0].distance_in_kms.toFixed(2);
     } else {
       distance.textContent = "0.00";
     }
