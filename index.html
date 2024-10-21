@@ -233,92 +233,147 @@
           </div>
         </div>
 
-        <div id="myChart"></div>
+        <div id="myChart" style="width: 96%; height: 600px"></div>
       </main>
     </div>
     <script>
-      // Fake data generation
-      const data = [
-        { time: "0 min", current: 10, voltage: 50, temperature: 20 },
-        { time: "1 min", current: 25, voltage: 65, temperature: 22 },
-        { time: "2 min", current: 30, voltage: 55, temperature: 24 },
-        { time: "3 min", current: 20, voltage: 45, temperature: 21 },
-        { time: "4 min", current: 35, voltage: 70, temperature: 29 },
-        { time: "5 min", current: 25, voltage: 60, temperature: 28 },
-        { time: "6 min", current: 15, voltage: 50, temperature: 35 },
-        { time: "7 min", current: 5, voltage: 65, temperature: 38 },
-        { time: "8 min", current: 35, voltage: 55, temperature: 32 },
-        { time: "9 min", current: 45, voltage: 50, temperature: 30 },
-        { time: "10 min", current: 35, voltage: 80, temperature: 28 },
-        { time: "11 min", current: 20, voltage: 60, temperature: 15 },
-      ];
+      // Sample fake data for voltage and current every minute for 24 hours (1440 data points)
+      const generateData = () => {
+        const data = [];
+        for (let i = 0; i < 1440; i++) {
+          const hour = Math.floor(i / 60);
+          const minute = i % 60;
+          const seconds = "00"; // You can modify this to include random seconds if needed
+          const timeLabel = `${hour < 10 ? "0" + hour : hour}:${
+            minute < 10 ? "0" + minute : minute
+          }:${seconds}`;
 
-      // Configuration for the chart
+          data.push({
+            time: timeLabel,
+            voltage: Math.random() * (240 - 220) + 220, // Random voltage between 220 and 240
+            current: Math.random() * (10 - 5) + 5, // Random current between 5 and 10
+          });
+        }
+        return data;
+      };
+
+      const data = generateData();
+
+      // Chart options
       const options = {
         container: document.getElementById("myChart"),
-        height: 600, // Set your desired height
         title: {
-          text: "Current, Voltage, and Temperature vs Time",
-          fontSize: 18,
+          text: "Voltage and Current over 24 Hours",
         },
         data: data,
         series: [
           {
             type: "line",
             xKey: "time",
-            yKey: "current",
-            stroke: "#ff0000", // Red for current
-            strokeWidth: 3,
-            marker: { enabled: true },
-            title: "Current",
-            interpolation: { type: "smooth" },
-          },
-          {
-            type: "line",
-            xKey: "time",
             yKey: "voltage",
-            stroke: "#00ff00", // Green for voltage
-            strokeWidth: 3,
+            yName: "Voltage (V)",
+            stroke: "#f56a79",
+            strokeWidth: 2,
             marker: { enabled: true },
-            title: "Voltage",
             interpolation: { type: "smooth" },
+            tooltip: {
+              renderer: (params) => {
+                return {
+                  content: `Time: ${
+                    params.datum.time
+                  }<br/>Voltage: ${params.datum.voltage.toFixed(2)} V`,
+                };
+              },
+            },
           },
           {
             type: "line",
             xKey: "time",
-            yKey: "temperature",
-            stroke: "#0000ff", // Blue for temperature
-            strokeWidth: 3,
+            yKey: "current",
+            yName: "Current (A)",
+            stroke: "#6794dc",
+            strokeWidth: 2,
             marker: { enabled: true },
-            title: "Temperature",
             interpolation: { type: "smooth" },
+            visible: false,
+            tooltip: {
+              renderer: (params) => {
+                return {
+                  content: `Time: ${
+                    params.datum.time
+                  }<br/>Current: ${params.datum.current.toFixed(2)} A`,
+                };
+              },
+            },
           },
         ],
         axes: [
           {
             type: "category",
             position: "bottom",
-            title: {
-              text: "Time",
-            },
+            title: { text: "Time (hh:mm:ss)" },
             label: {
-              rotation: 60, // Rotate labels if necessary
+              rotation: 45, // Rotate x-axis labels for better readability
+              formatter: (params) => {
+                const [hour, minute, second] = params.value.split(":");
+                return second === "00" && minute === "00"
+                  ? `${hour}:${minute}:${second}`
+                  : "";
+                // Shows only full hour times like 00:00:00, 01:00:00, etc.
+              },
             },
           },
           {
             type: "number",
             position: "left",
             title: {
-              text: "Values",
+              text: "Voltage (V) / Current (A)",
             },
           },
         ],
         legend: {
           position: "bottom",
+          item: {
+            marker: {
+              strokeWidth: 2, // Customize the marker stroke if needed
+              shape: "circle", // You can change the shape here if required
+            },
+            label: {
+              color: "#000", // Custom color for the legend labels
+              fontStyle: "italic", // You can apply a style like bold, italic
+            },
+          },
+        },
+        navigator: {
+          enabled: true,
+          height: 40,
+          min: 0,
+          max: 2 / 24,
+          mask: {
+            fill: "#0d5e36", // Customize the fill color of the selection area
+            stroke: "#0d5e36", // Customize the stroke of the selection area
+          },
+          minHandle: {
+            fill: "#0d5e36", // Color of the left handle
+            stroke: "#0d5e36", // Stroke color of the left handle
+            width: 10, // Width of the handle
+            height: 20, // Height of the handle
+          },
+          maxHandle: {
+            fill: "#0d5e36", // Color of the right handle
+            stroke: "#0d5e36", // Stroke color of the right handle
+            width: 10,
+            height: 20,
+          },
+        },
+        interactions: {
+          tooltip: {
+            enabled: true,
+          },
         },
       };
 
-      // Render the chart
+      // Create the chart
       agCharts.AgCharts.create(options);
     </script>
   </body>
