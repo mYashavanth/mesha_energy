@@ -252,63 +252,202 @@
     </div>
 
     <script>
-      // Function to generate dummy data for the last 24 hours
-      function generateDummyData() {
-        const data = [];
-        const now = new Date();
-        for (let i = 0; i < 1440; i++) {
-          // 1440 minutes in 24 hours
-          const date = new Date(now - i * 60 * 1000); // Get the time for each minute
-          const log_time = date.toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-          });
+      // Function to fetch data from the API
+      async function fetchData() {
+        const deviceId = localStorage.getItem("selectedDeviceId");
+        const authToken = localStorage.getItem("authToken");
 
-          data.push({
-            log_time,
-            b1: (Math.random() * (13.5 - 12.5) + 12.5).toFixed(2), // Random voltage between 12.5 and 13.5
-            b2: (Math.random() * (13.5 - 12.5) + 12.5).toFixed(2),
-            b3: (Math.random() * (13.5 - 12.5) + 12.5).toFixed(2),
-            b4: (Math.random() * (13.5 - 12.5) + 12.5).toFixed(2),
-            current:
-              (Math.random() * (1.5 - 0.1) + 0.1).toFixed(2) *
-              (Math.random() < 0.5 ? -1 : 1), // Random current between -1.5 and 1.5
-          });
+        if (!deviceId || !authToken) {
+          console.error("Device ID or Auth Token not found in local storage.");
+          return [];
         }
-        return data.reverse(); // Reverse to get latest data at the end
+
+        const url = `https://stingray-app-4smpo.ondigitalocean.app/graph/24hours/${deviceId}/${authToken}`;
+
+        try {
+          const response = await fetch(url);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const result = await response.json();
+          const dummy = [
+            {
+              b1: "12.68",
+              b2: "12.63",
+              b3: "12.61",
+              b4: "12.56",
+              charging_ah: "0.0",
+              current: "-2.46",
+              discharging_ah: "0.0312",
+              lat: "2815.2829",
+              log_date: "Mon, 21 Oct 2024 00:00:00 GMT",
+              log_time: "16:48:13",
+              long: "7751.015",
+              row_num: 194,
+              temperature: "37",
+            },
+            {
+              b1: "12.65",
+              b2: "12.60",
+              b3: "12.57",
+              b4: "12.52",
+              charging_ah: "0.0",
+              current: "-0.98",
+              discharging_ah: "0.2168",
+              lat: "2815.3472",
+              log_date: "Mon, 21 Oct 2024 00:00:00 GMT",
+              log_time: "16:49:12",
+              long: "7751.0513",
+              row_num: 195,
+              temperature: "37",
+            },
+            {
+              b1: "12.63",
+              b2: "12.54",
+              b3: "12.55",
+              b4: "12.48",
+              charging_ah: "0.0",
+              current: "-0.69",
+              discharging_ah: "0.2781",
+              lat: "2815.4106",
+              log_date: "Mon, 21 Oct 2024 00:00:00 GMT",
+              log_time: "16:50:13",
+              long: "7751.1003",
+              row_num: 196,
+              temperature: "37",
+            },
+            {
+              b1: "11.52",
+              b2: "11.89",
+              b3: "11.69",
+              b4: "11.93",
+              charging_ah: "0.0",
+              current: "-54.52",
+              discharging_ah: "0.2559",
+              lat: "2815.4883",
+              log_date: "Mon, 21 Oct 2024 00:00:00 GMT",
+              log_time: "16:51:12",
+              long: "7751.1686",
+              row_num: 197,
+              temperature: "37",
+            },
+            {
+              b1: "12.61",
+              b2: "12.55",
+              b3: "12.54",
+              b4: "12.49",
+              charging_ah: "0.0",
+              current: "-2.33",
+              discharging_ah: "0.0999",
+              lat: "2815.5036",
+              log_date: "Mon, 21 Oct 2024 00:00:00 GMT",
+              log_time: "16:52:12",
+              long: "7751.183",
+              row_num: 198,
+              temperature: "37",
+            },
+            {
+              b1: "12.65",
+              b2: "12.56",
+              b3: "12.57",
+              b4: "12.50",
+              charging_ah: "0.0",
+              current: "-0.58",
+              discharging_ah: "0.2131",
+              lat: "2815.3792",
+              log_date: "Mon, 21 Oct 2024 00:00:00 GMT",
+              log_time: "16:54:12",
+              long: "7751.081",
+              row_num: 199,
+              temperature: "37",
+            },
+          ];
+          console.log({ datas: processApiData(dummy), result });
+
+          return processApiData(result);
+        } catch (error) {
+          console.error("Error fetching data from API:", error);
+          return [];
+        }
+      }
+
+      // Function to process API data into the required format
+
+      // Function to process API data into the required format
+      function processApiData(apiData) {
+        return apiData
+          .map((entry) => {
+            // Calculate bank voltage as the sum of b1, b2, b3, and b4
+            const bankVoltage =
+              parseFloat(entry.b1) +
+              parseFloat(entry.b2) +
+              parseFloat(entry.b3) +
+              parseFloat(entry.b4);
+
+            // Extract log_date and log_time separately
+            const logDate = new Date(entry.log_date);
+            const logTimeParts = entry.log_time.split(":");
+
+            // Construct a valid date string in ISO format
+            // Assuming log_time is in HH:mm:ss format
+            logDate.setHours(logTimeParts[0], logTimeParts[1], logTimeParts[2]);
+
+            // Check if the date is valid
+            if (isNaN(logDate.getTime())) {
+              console.error(
+                "Invalid date:",
+                entry.log_date + " " + entry.log_time
+              );
+              return null; // or handle it according to your logic
+            }
+
+            // Format the time to desired format (hh:mm:ss AM/PM)
+            const logTime = logDate.toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
+              hour12: true,
+            });
+
+            return {
+              log_time: logTime, // Formatted log time
+              b1: parseFloat(entry.b1), // Convert b1 to float
+              b2: parseFloat(entry.b2), // Convert b2 to float
+              b3: parseFloat(entry.b3), // Convert b3 to float
+              b4: parseFloat(entry.b4), // Convert b4 to float
+              current: parseFloat(entry.current), // Convert current to float
+              bank_voltage: parseFloat(bankVoltage.toFixed(2)), // Keep bank_voltage as a number
+            };
+          })
+          .filter((entry) => entry !== null); // Remove any null entries from the array
       }
 
       // Function to update the charts with new data
-      function updateCharts() {
+      async function updateCharts() {
         // Clear existing charts
         document.getElementById("batteryVoltageChart").innerHTML = "";
         document.getElementById("currentChart").innerHTML = "";
         document.getElementById("bankVoltageChart").innerHTML = "";
 
-        // Generate the dummy data
-        const data = generateDummyData();
+        // Fetch the actual data from the API
+        const data = await fetchData();
+        const totalDataPoints = data.length;
 
-        // Parse log_time and convert voltage/current strings to numbers
-        const parseData = data.map((entry) => ({
-          log_time: entry.log_time, // Use log_time directly as hh:mm:ss
-          b1: parseFloat(entry.b1), // Convert string to float for b1
-          b2: parseFloat(entry.b2), // Convert string to float for b2
-          b3: parseFloat(entry.b3), // Convert string to float for b3
-          b4: parseFloat(entry.b4), // Convert string to float for b4
-          current: parseFloat(entry.current), // Convert string to float for current
-          bank_voltage:
-            parseFloat(entry.b1) +
-            parseFloat(entry.b2) +
-            parseFloat(entry.b3) +
-            parseFloat(entry.b4), // Sum the battery voltages
-        }));
+        // const totalDataPoints = 1440; // Replace this with the actual total data points you have
 
-        function getXAxisType(dataLength) {
-          if (dataLength > 120) {
-            return "category"; // Use categories for more data points
-          }
-          return "number"; // Use number for less data points
+        // Determine how many data points to show based on the total
+        const dataToShow = totalDataPoints < 60 ? totalDataPoints : 60;
+
+        // Calculate min and max for the navigator
+        const maxValue = totalDataPoints;
+        const minValue =
+          totalDataPoints > dataToShow ? totalDataPoints - dataToShow : 0;
+
+        // console.log({ xaxislength });
+
+        if (data.length === 0) {
+          console.error("No data available to display on the charts.");
+          return; // Exit if there's no data
         }
 
         // First Chart: Battery Voltages (b1, b2, b3, b4)
@@ -317,7 +456,7 @@
           title: {
             text: "Battery Voltages (b1, b2, b3, b4)",
           },
-          data: parseData,
+          data: data,
           series: [
             {
               type: "line",
@@ -354,7 +493,7 @@
           ],
           axes: [
             {
-              type: getXAxisType(parseData.length),
+              type: "category",
               position: "bottom",
               title: { text: "Time (hh:mm:ss)" },
             },
@@ -367,21 +506,21 @@
           navigator: {
             enabled: true,
             height: 40,
-            min: 23 / 24,
-            max: 24 / 24,
+            min: minValue / totalDataPoints,
+            max: maxValue / totalDataPoints,
             mask: {
-              fill: "#0d5e36", // Customize the fill color of the selection area
-              stroke: "#0d5e36", // Customize the stroke of the selection area
+              fill: "#0d5e36",
+              stroke: "#0d5e36",
             },
             minHandle: {
-              fill: "#0d5e36", // Color of the left handle
-              stroke: "#0d5e36", // Stroke color of the left handle
-              width: 10, // Width of the handle
-              height: 20, // Height of the handle
+              fill: "#0d5e36",
+              stroke: "#0d5e36",
+              width: 10,
+              height: 20,
             },
             maxHandle: {
-              fill: "#0d5e36", // Color of the right handle
-              stroke: "#0d5e36", // Stroke color of the right handle
+              fill: "#0d5e36",
+              stroke: "#0d5e36",
               width: 10,
               height: 20,
             },
@@ -400,7 +539,7 @@
           title: {
             text: "Current Over Time",
           },
-          data: parseData,
+          data: data,
           series: [
             {
               type: "line",
@@ -413,7 +552,7 @@
           ],
           axes: [
             {
-              type: getXAxisType(parseData.length),
+              type: "category",
               position: "bottom",
               title: { text: "Time (hh:mm:ss)" },
             },
@@ -426,21 +565,21 @@
           navigator: {
             enabled: true,
             height: 40,
-            min: 23 / 24,
-            max: 24 / 24,
+            min: minValue / totalDataPoints,
+            max: maxValue / totalDataPoints,
             mask: {
-              fill: "#0d5e36", // Customize the fill color of the selection area
-              stroke: "#0d5e36", // Customize the stroke of the selection area
+              fill: "#0d5e36",
+              stroke: "#0d5e36",
             },
             minHandle: {
-              fill: "#0d5e36", // Color of the left handle
-              stroke: "#0d5e36", // Stroke color of the left handle
-              width: 10, // Width of the handle
-              height: 20, // Height of the handle
+              fill: "#0d5e36",
+              stroke: "#0d5e36",
+              width: 10,
+              height: 20,
             },
             maxHandle: {
-              fill: "#0d5e36", // Color of the right handle
-              stroke: "#0d5e36", // Stroke color of the right handle
+              fill: "#0d5e36",
+              stroke: "#0d5e36",
               width: 10,
               height: 20,
             },
@@ -459,7 +598,7 @@
           title: {
             text: "Bank Voltage (Sum of b1, b2, b3, b4)",
           },
-          data: parseData,
+          data: data,
           series: [
             {
               type: "line",
@@ -472,7 +611,7 @@
           ],
           axes: [
             {
-              type: getXAxisType(parseData.length),
+              type: "category",
               position: "bottom",
               title: { text: "Time (hh:mm:ss)" },
             },
@@ -485,21 +624,21 @@
           navigator: {
             enabled: true,
             height: 40,
-            min: 23 / 24,
-            max: 24 / 24,
+            min: minValue / totalDataPoints,
+            max: maxValue / totalDataPoints,
             mask: {
-              fill: "#0d5e36", // Customize the fill color of the selection area
-              stroke: "#0d5e36", // Customize the stroke of the selection area
+              fill: "#0d5e36",
+              stroke: "#0d5e36",
             },
             minHandle: {
-              fill: "#0d5e36", // Color of the left handle
-              stroke: "#0d5e36", // Stroke color of the left handle
-              width: 10, // Width of the handle
-              height: 20, // Height of the handle
+              fill: "#0d5e36",
+              stroke: "#0d5e36",
+              width: 10,
+              height: 20,
             },
             maxHandle: {
-              fill: "#0d5e36", // Color of the right handle
-              stroke: "#0d5e36", // Stroke color of the right handle
+              fill: "#0d5e36",
+              stroke: "#0d5e36",
               width: 10,
               height: 20,
             },
@@ -517,7 +656,7 @@
       updateCharts();
 
       // Refresh charts every minute
-      setInterval(updateCharts, 10000);
+      setInterval(updateCharts, 10000); // Adjust interval as needed
     </script>
   </body>
 </html>
