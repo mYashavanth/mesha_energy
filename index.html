@@ -256,6 +256,7 @@
       async function fetchData() {
         const deviceId = localStorage.getItem("selectedDeviceId");
         const authToken = localStorage.getItem("authToken");
+        console.log({ deviceId, authToken });
 
         if (!deviceId || !authToken) {
           console.error("Device ID or Auth Token not found in local storage.");
@@ -656,7 +657,8 @@
       updateCharts();
 
       // Refresh charts every minute
-      setInterval(updateCharts, 30000); // Adjust interval as needed
+      var graphIntervalId;
+      graphIntervalId = setInterval(updateCharts, 30000); // Adjust interval as needed
     </script>
   </body>
 </html>
