@@ -95,7 +95,7 @@ body {
   border-radius: 50%;
   background-color: #ecfff6;
 }
-#myChart {
+.myChart {
   margin: 24px;
   border-radius: 8px;
   overflow: hidden;

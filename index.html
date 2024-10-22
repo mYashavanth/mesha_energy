@@ -233,148 +233,291 @@
           </div>
         </div>
 
-        <div id="myChart" style="width: 96%; height: 600px"></div>
+        <div
+          class="myChart"
+          id="batteryVoltageChart"
+          style="height: 600px; margin-bottom: 20px"
+        ></div>
+        <div
+          class="myChart"
+          id="currentChart"
+          style="height: 600px; margin-bottom: 20px"
+        ></div>
+        <div
+          class="myChart"
+          id="bankVoltageChart"
+          style="height: 600px; margin-bottom: 20px"
+        ></div>
       </main>
     </div>
+
     <script>
-      // Sample fake data for voltage and current every minute for 24 hours (1440 data points)
-      const generateData = () => {
+      // Function to generate dummy data for the last 24 hours
+      function generateDummyData() {
         const data = [];
+        const now = new Date();
         for (let i = 0; i < 1440; i++) {
-          const hour = Math.floor(i / 60);
-          const minute = i % 60;
-          const seconds = "00"; // You can modify this to include random seconds if needed
-          const timeLabel = `${hour < 10 ? "0" + hour : hour}:${
-            minute < 10 ? "0" + minute : minute
-          }:${seconds}`;
+          // 1440 minutes in 24 hours
+          const date = new Date(now - i * 60 * 1000); // Get the time for each minute
+          const log_time = date.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+          });
 
           data.push({
-            time: timeLabel,
-            voltage: Math.random() * (240 - 220) + 220, // Random voltage between 220 and 240
-            current: Math.random() * (10 - 5) + 5, // Random current between 5 and 10
+            log_time,
+            b1: (Math.random() * (13.5 - 12.5) + 12.5).toFixed(2), // Random voltage between 12.5 and 13.5
+            b2: (Math.random() * (13.5 - 12.5) + 12.5).toFixed(2),
+            b3: (Math.random() * (13.5 - 12.5) + 12.5).toFixed(2),
+            b4: (Math.random() * (13.5 - 12.5) + 12.5).toFixed(2),
+            current:
+              (Math.random() * (1.5 - 0.1) + 0.1).toFixed(2) *
+              (Math.random() < 0.5 ? -1 : 1), // Random current between -1.5 and 1.5
           });
         }
-        return data;
-      };
+        return data.reverse(); // Reverse to get latest data at the end
+      }
 
-      const data = generateData();
+      // Function to update the charts with new data
+      function updateCharts() {
+        // Clear existing charts
+        document.getElementById("batteryVoltageChart").innerHTML = "";
+        document.getElementById("currentChart").innerHTML = "";
+        document.getElementById("bankVoltageChart").innerHTML = "";
 
-      // Chart options
-      const options = {
-        container: document.getElementById("myChart"),
-        title: {
-          text: "Voltage and Current over 24 Hours",
-        },
-        data: data,
-        series: [
-          {
-            type: "line",
-            xKey: "time",
-            yKey: "voltage",
-            yName: "Voltage (V)",
-            stroke: "#f56a79",
-            strokeWidth: 2,
-            marker: { enabled: true },
-            interpolation: { type: "smooth" },
-            tooltip: {
-              renderer: (params) => {
-                return {
-                  content: `Time: ${
-                    params.datum.time
-                  }<br/>Voltage: ${params.datum.voltage.toFixed(2)} V`,
-                };
-              },
+        // Generate the dummy data
+        const data = generateDummyData();
+
+        // Parse log_time and convert voltage/current strings to numbers
+        const parseData = data.map((entry) => ({
+          log_time: entry.log_time, // Use log_time directly as hh:mm:ss
+          b1: parseFloat(entry.b1), // Convert string to float for b1
+          b2: parseFloat(entry.b2), // Convert string to float for b2
+          b3: parseFloat(entry.b3), // Convert string to float for b3
+          b4: parseFloat(entry.b4), // Convert string to float for b4
+          current: parseFloat(entry.current), // Convert string to float for current
+          bank_voltage:
+            parseFloat(entry.b1) +
+            parseFloat(entry.b2) +
+            parseFloat(entry.b3) +
+            parseFloat(entry.b4), // Sum the battery voltages
+        }));
+
+        function getXAxisType(dataLength) {
+          if (dataLength > 120) {
+            return "category"; // Use categories for more data points
+          }
+          return "number"; // Use number for less data points
+        }
+
+        // First Chart: Battery Voltages (b1, b2, b3, b4)
+        const batteryVoltageOptions = {
+          container: document.getElementById("batteryVoltageChart"),
+          title: {
+            text: "Battery Voltages (b1, b2, b3, b4)",
+          },
+          data: parseData,
+          series: [
+            {
+              type: "line",
+              xKey: "log_time",
+              yKey: "b1",
+              yName: "b1",
+              stroke: "#f56a79",
+              interpolation: { type: "smooth" },
             },
-          },
-          {
-            type: "line",
-            xKey: "time",
-            yKey: "current",
-            yName: "Current (A)",
-            stroke: "#6794dc",
-            strokeWidth: 2,
-            marker: { enabled: true },
-            interpolation: { type: "smooth" },
-            visible: false,
-            tooltip: {
-              renderer: (params) => {
-                return {
-                  content: `Time: ${
-                    params.datum.time
-                  }<br/>Current: ${params.datum.current.toFixed(2)} A`,
-                };
-              },
+            {
+              type: "line",
+              xKey: "log_time",
+              yKey: "b2",
+              yName: "b2",
+              stroke: "#6794dc",
+              interpolation: { type: "smooth" },
             },
-          },
-        ],
-        axes: [
-          {
-            type: "category",
-            position: "bottom",
-            title: { text: "Time (hh:mm:ss)" },
-            label: {
-              rotation: 45, // Rotate x-axis labels for better readability
-              formatter: (params) => {
-                const [hour, minute, second] = params.value.split(":");
-                return second === "00" && minute === "00"
-                  ? `${hour}:${minute}:${second}`
-                  : "";
-                // Shows only full hour times like 00:00:00, 01:00:00, etc.
-              },
+            {
+              type: "line",
+              xKey: "log_time",
+              yKey: "b3",
+              yName: "b3",
+              stroke: "#7cb342",
+              interpolation: { type: "smooth" },
             },
-          },
-          {
-            type: "number",
-            position: "left",
-            title: {
-              text: "Voltage (V) / Current (A)",
+            {
+              type: "line",
+              xKey: "log_time",
+              yKey: "b4",
+              yName: "b4",
+              stroke: "#ffca28",
+              interpolation: { type: "smooth" },
             },
-          },
-        ],
-        legend: {
-          position: "bottom",
-          item: {
-            marker: {
-              strokeWidth: 2, // Customize the marker stroke if needed
-              shape: "circle", // You can change the shape here if required
+          ],
+          axes: [
+            {
+              type: getXAxisType(parseData.length),
+              position: "bottom",
+              title: { text: "Time (hh:mm:ss)" },
             },
-            label: {
-              color: "#000", // Custom color for the legend labels
-              fontStyle: "italic", // You can apply a style like bold, italic
+            {
+              type: "number",
+              position: "left",
+              title: { text: "Voltage (V)" },
             },
-          },
-        },
-        navigator: {
-          enabled: true,
-          height: 40,
-          min: 1 / 24,
-          max: 3 / 24,
-          mask: {
-            fill: "#0d5e36", // Customize the fill color of the selection area
-            stroke: "#0d5e36", // Customize the stroke of the selection area
-          },
-          minHandle: {
-            fill: "#0d5e36", // Color of the left handle
-            stroke: "#0d5e36", // Stroke color of the left handle
-            width: 10, // Width of the handle
-            height: 20, // Height of the handle
-          },
-          maxHandle: {
-            fill: "#0d5e36", // Color of the right handle
-            stroke: "#0d5e36", // Stroke color of the right handle
-            width: 10,
-            height: 20,
-          },
-        },
-        interactions: {
-          tooltip: {
+          ],
+          navigator: {
             enabled: true,
+            height: 40,
+            min: 23 / 24,
+            max: 24 / 24,
+            mask: {
+              fill: "#0d5e36", // Customize the fill color of the selection area
+              stroke: "#0d5e36", // Customize the stroke of the selection area
+            },
+            minHandle: {
+              fill: "#0d5e36", // Color of the left handle
+              stroke: "#0d5e36", // Stroke color of the left handle
+              width: 10, // Width of the handle
+              height: 20, // Height of the handle
+            },
+            maxHandle: {
+              fill: "#0d5e36", // Color of the right handle
+              stroke: "#0d5e36", // Stroke color of the right handle
+              width: 10,
+              height: 20,
+            },
           },
-        },
-      };
+          interactions: {
+            tooltip: {
+              enabled: true,
+            },
+          },
+        };
+        agCharts.AgCharts.create(batteryVoltageOptions);
 
-      // Create the chart
-      agCharts.AgCharts.create(options);
+        // Second Chart: Current
+        const currentOptions = {
+          container: document.getElementById("currentChart"),
+          title: {
+            text: "Current Over Time",
+          },
+          data: parseData,
+          series: [
+            {
+              type: "line",
+              xKey: "log_time",
+              yKey: "current",
+              yName: "Current (A)",
+              stroke: "#8e44ad",
+              interpolation: { type: "smooth" },
+            },
+          ],
+          axes: [
+            {
+              type: getXAxisType(parseData.length),
+              position: "bottom",
+              title: { text: "Time (hh:mm:ss)" },
+            },
+            {
+              type: "number",
+              position: "left",
+              title: { text: "Current (A)" },
+            },
+          ],
+          navigator: {
+            enabled: true,
+            height: 40,
+            min: 23 / 24,
+            max: 24 / 24,
+            mask: {
+              fill: "#0d5e36", // Customize the fill color of the selection area
+              stroke: "#0d5e36", // Customize the stroke of the selection area
+            },
+            minHandle: {
+              fill: "#0d5e36", // Color of the left handle
+              stroke: "#0d5e36", // Stroke color of the left handle
+              width: 10, // Width of the handle
+              height: 20, // Height of the handle
+            },
+            maxHandle: {
+              fill: "#0d5e36", // Color of the right handle
+              stroke: "#0d5e36", // Stroke color of the right handle
+              width: 10,
+              height: 20,
+            },
+          },
+          interactions: {
+            tooltip: {
+              enabled: true,
+            },
+          },
+        };
+        agCharts.AgCharts.create(currentOptions);
+
+        // Third Chart: Bank Voltage (Sum of b1, b2, b3, b4)
+        const bankVoltageOptions = {
+          container: document.getElementById("bankVoltageChart"),
+          title: {
+            text: "Bank Voltage (Sum of b1, b2, b3, b4)",
+          },
+          data: parseData,
+          series: [
+            {
+              type: "line",
+              xKey: "log_time",
+              yKey: "bank_voltage",
+              yName: "Bank Voltage",
+              stroke: "#e74c3c",
+              interpolation: { type: "smooth" },
+            },
+          ],
+          axes: [
+            {
+              type: getXAxisType(parseData.length),
+              position: "bottom",
+              title: { text: "Time (hh:mm:ss)" },
+            },
+            {
+              type: "number",
+              position: "left",
+              title: { text: "Voltage (V)" },
+            },
+          ],
+          navigator: {
+            enabled: true,
+            height: 40,
+            min: 23 / 24,
+            max: 24 / 24,
+            mask: {
+              fill: "#0d5e36", // Customize the fill color of the selection area
+              stroke: "#0d5e36", // Customize the stroke of the selection area
+            },
+            minHandle: {
+              fill: "#0d5e36", // Color of the left handle
+              stroke: "#0d5e36", // Stroke color of the left handle
+              width: 10, // Width of the handle
+              height: 20, // Height of the handle
+            },
+            maxHandle: {
+              fill: "#0d5e36", // Color of the right handle
+              stroke: "#0d5e36", // Stroke color of the right handle
+              width: 10,
+              height: 20,
+            },
+          },
+          interactions: {
+            tooltip: {
+              enabled: true,
+            },
+          },
+        };
+        agCharts.AgCharts.create(bankVoltageOptions);
+      }
+
+      // Initial chart generation
+      updateCharts();
+
+      // Refresh charts every minute
+      setInterval(updateCharts, 10000);
     </script>
   </body>
 </html>
