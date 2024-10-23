@@ -55,9 +55,9 @@ document.addEventListener("DOMContentLoaded", async function () {
       }
 
       await fetchDeviceDetails(selectedDeviceId);
-      clearInterval(graphIntervalId);
       updateCharts();
-      graphIntervalId = setInterval(updateCharts, 30000);
+      // clearInterval(graphIntervalId);
+      // graphIntervalId = setInterval(updateCharts, 30000);
 
       clearInterval(intervalId);
       intervalId = setInterval(async () => {

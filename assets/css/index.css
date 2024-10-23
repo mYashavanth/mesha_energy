@@ -95,11 +95,30 @@ body {
   border-radius: 50%;
   background-color: #ecfff6;
 }
+.chartConatiner {
+  /* border: 1px solid black; */
+  padding: 12px 24px;
+  border-radius: 8px;
+  position: relative;
+}
+.refreshChart {
+  position: absolute;
+  z-index: 1;
+  top: 24px;
+  right: 36px;
+  border-radius: 50% !important;
+  font-size: 18px !important;
+  border: 1px solid lightgray !important;
+}
+.refreshChart:hover {
+  background-color: #efefef !important;
+  color: #0d5e36 !important;
+}
 .myChart {
-  margin: 24px;
   border-radius: 8px;
   overflow: hidden;
-  /* border: 1px solid black; */
+  height: 600px;
   box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px,
     rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
+  /* border: 1px solid black; */
 }

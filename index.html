@@ -232,22 +232,24 @@
             </div>
           </div>
         </div>
-
-        <div
-          class="myChart"
-          id="batteryVoltageChart"
-          style="height: 600px; margin-bottom: 20px"
-        ></div>
-        <div
-          class="myChart"
-          id="currentChart"
-          style="height: 600px; margin-bottom: 20px"
-        ></div>
-        <div
-          class="myChart"
-          id="bankVoltageChart"
-          style="height: 600px; margin-bottom: 20px"
-        ></div>
+        <div class="chartConatiner">
+          <button class="refreshChart btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-clockwise"></i>
+          </button>
+          <div class="myChart" id="batteryVoltageChart"></div>
+        </div>
+        <div class="chartConatiner">
+          <button class="refreshChart btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-clockwise"></i>
+          </button>
+          <div class="myChart" id="currentChart"></div>
+        </div>
+        <div class="chartConatiner">
+          <button class="refreshChart btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-clockwise"></i>
+          </button>
+          <div class="myChart" id="bankVoltageChart"></div>
+        </div>
       </main>
     </div>
 
@@ -373,8 +375,6 @@
       }
 
       // Function to process API data into the required format
-
-      // Function to process API data into the required format
       function processApiData(apiData) {
         return apiData
           .map((entry) => {
@@ -411,13 +411,13 @@
             });
 
             return {
-              log_time: logTime, // Formatted log time
-              b1: parseFloat(entry.b1), // Convert b1 to float
-              b2: parseFloat(entry.b2), // Convert b2 to float
-              b3: parseFloat(entry.b3), // Convert b3 to float
-              b4: parseFloat(entry.b4), // Convert b4 to float
-              current: parseFloat(entry.current), // Convert current to float
-              bank_voltage: parseFloat(bankVoltage.toFixed(2)), // Keep bank_voltage as a number
+              log_time: logTime,
+              b1: parseFloat(entry.b1),
+              b2: parseFloat(entry.b2),
+              b3: parseFloat(entry.b3),
+              b4: parseFloat(entry.b4),
+              current: parseFloat(entry.current),
+              bank_voltage: parseFloat(bankVoltage.toFixed(2)),
             };
           })
           .filter((entry) => entry !== null); // Remove any null entries from the array
@@ -425,30 +425,19 @@
 
       // Function to update the charts with new data
       async function updateCharts() {
-        // Clear existing charts
         document.getElementById("batteryVoltageChart").innerHTML = "";
         document.getElementById("currentChart").innerHTML = "";
         document.getElementById("bankVoltageChart").innerHTML = "";
 
-        // Fetch the actual data from the API
         const data = await fetchData();
         const totalDataPoints = data.length;
-
-        // const totalDataPoints = 1440; // Replace this with the actual total data points you have
-
-        // Determine how many data points to show based on the total
         const dataToShow = totalDataPoints < 60 ? totalDataPoints : 60;
-
-        // Calculate min and max for the navigator
         const maxValue = totalDataPoints;
         const minValue =
           totalDataPoints > dataToShow ? totalDataPoints - dataToShow : 0;
 
-        // console.log({ xaxislength });
-
         if (data.length === 0) {
-          console.error("No data available to display on the charts.");
-          return; // Exit if there's no data
+          console.log("No data available to display on the charts.");
         }
 
         // First Chart: Battery Voltages (b1, b2, b3, b4)
@@ -653,12 +642,16 @@
         agCharts.AgCharts.create(bankVoltageOptions);
       }
 
-      // Initial chart generation
       updateCharts();
 
       // Refresh charts every minute
-      var graphIntervalId;
-      graphIntervalId = setInterval(updateCharts, 30000); // Adjust interval as needed
+      // var graphIntervalId;
+      // graphIntervalId = setInterval(updateCharts, 30000);
+      let refreshButtons = document.querySelectorAll(".refreshChart");
+
+      for (let i = 0; i < refreshButtons.length; i++) {
+        refreshButtons[i].addEventListener("click", updateCharts);
+      }
     </script>
   </body>
 </html>
