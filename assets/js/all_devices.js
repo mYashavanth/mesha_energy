@@ -37,7 +37,8 @@ async function fetchAllDevicesData(customerId) {
       window.location.href = "login.html";
     } else {
       console.log("device data:", data);
-      const formattedData = data.map((item) => ({
+      const formattedData = data.map((item, index) => ({
+        index: index + 1,
         deviceId: item.device_id,
         deviceLogDate: convertDateFormat(item.device_log_date),
         lat: convertToDecimalDegrees(Number(item.lat)),
@@ -149,23 +150,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   }
 });
 const gridOptions = {
-  rowData: [
-    {
-      bankVoltage: "55.84",
-      deviceId: "MESH0002",
-      deviceLogDate: "09/10/2024",
-      lat: 28.32406,
-      long: 77.819845,
-      speed: "0",
-      temperature: "37",
-      time: "23:38",
-      v1: "14.12",
-      v2: "13.90",
-      v3: "13.92",
-      v4: "13.90",
-      current: "5.5",
-    },
-  ],
+  rowData: [],
   columnDefs: [
     {
       headerName: "Device ID",

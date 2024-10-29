@@ -222,7 +222,8 @@ async function fetchCustomerData(gridApi) {
       ? (window.location.href = "login.html")
       : console.log("Customer data:", data);
 
-    const formattedData = data.map((item) => ({
+    const formattedData = data.map((item, index) => ({
+      index: index + 1,
       customerName: item.customer_name,
       companyAddress: item.company_address,
       createdDate: formatDate(item.created_date),
@@ -286,7 +287,7 @@ const gridOptions = {
   columnDefs: [
     {
       headerName: "Sl. No",
-      field: "customerId",
+      field: "index",
       maxWidth: 100,
       filter: false,
       suppressAutoSize: true,
@@ -338,7 +339,6 @@ const gridOptions = {
       headerName: "Status",
       field: "status",
       filter: false,
-      sortable: false,
       maxWidth: 150,
       suppressAutoSize: true,
       cellRenderer: StatusCellRenderer,

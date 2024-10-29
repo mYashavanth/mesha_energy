@@ -129,6 +129,11 @@ input:checked + .slider:before {
   box-shadow: none !important;
   border: 1px solid #0d5e36;
 }
+.modalInput select:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  border: 1px solid #0d5e36;
+}
 .modal-footer {
   display: flex !important;
   justify-content: space-between !important;

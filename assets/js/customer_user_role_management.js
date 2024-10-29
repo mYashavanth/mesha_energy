@@ -2,6 +2,7 @@ const addUserBtn = document.getElementById("addUserBtn");
 const usernameInput = document.getElementById("username");
 const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
+const customerId = document.getElementById("customerId");
 const inputValidationMsg = document.getElementById("inputValidationMsg");
 const spinnerHTML = `
     <div class="spinner-border spinner-border-sm" role="status">
@@ -121,17 +122,10 @@ class StatusCellRenderer {
   }
 }
 
-function formatDate(dateString) {
-  const date = new Date(dateString);
-  const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const year = date.getFullYear();
-
-  return `${day}-${month}-${year}`;
-}
 let isEditing = false;
 const userData = {
   super_admin_id: "",
+  customer_id: "",
   username: "",
   email: "",
   password: "",
@@ -142,9 +136,12 @@ const onBtnAdd = () => {
   userData.username = "";
   userData.email = "";
   userData.password = "";
+  userData.customer_id = "";
+
   usernameInput.value = "";
   emailInput.value = "";
   passwordInput.value = "";
+  customerId.value = "";
 };
 function handleEdit(rowData) {
   isEditing = true;
@@ -153,9 +150,11 @@ function handleEdit(rowData) {
   userData.super_admin_id = rowData.id;
   userData.username = rowData.userName;
   userData.email = rowData.email;
+  userData.customer_id = rowData.customerId;
   usernameInput.value = rowData.userName;
   emailInput.value = rowData.email;
   passwordInput.value = "";
+  customerId.value = rowData.customerId;
 }
 const handleUserSubmit = async (event) => {
   event.preventDefault();
@@ -170,14 +169,15 @@ const handleUserSubmit = async (event) => {
     addUserBtn.disabled = true;
     addUserBtn.innerHTML = spinnerHTML;
     const apiUrl = !isEditing
-      ? "https://stingray-app-4smpo.ondigitalocean.app/super-admin-users/add"
-      : "https://stingray-app-4smpo.ondigitalocean.app/super-admin-users/update";
+      ? "https://stingray-app-4smpo.ondigitalocean.app/app-users-add"
+      : "";
 
     const formData = new FormData();
     formData.append("token", authToken);
     formData.append("username", userData.username);
     formData.append("email", userData.email);
     formData.append("password", userData.password);
+    formData.append("customer_id", userData.customer_id);
 
     if (isEditing) {
       formData.append("super_admin_id", userData.super_admin_id);
@@ -193,10 +193,15 @@ const handleUserSubmit = async (event) => {
     console.log("data", data);
 
     if (data.errFlag === 0) {
-      fetchSuperAdminUsers(gridApi);
+      fetchUsers(gridApi);
       closeModal();
     } else {
       console.error("Server returned an error:", data);
+      inputValidationMsg.style.display = "block";
+      inputValidationMsg.innerText = data.message || "Failed to add user";
+      setTimeout(() => {
+        inputValidationMsg.style.display = "none";
+      }, 2000);
     }
   } catch (error) {
     console.error("Error occurred during submission:", error);
@@ -216,9 +221,9 @@ function closeModal() {
 const handlechange = (event) => {
   userData[event.target.name] = event.target.value;
 };
-async function fetchSuperAdminUsers(gridApi) {
+async function fetchUsers(gridApi) {
   const authToken = localStorage.getItem("authToken");
-  const apiUrl = `https://stingray-app-4smpo.ondigitalocean.app/super-admin-users/all/${authToken}`;
+  const apiUrl = `https://stingray-app-4smpo.ondigitalocean.app/app-users-all/${authToken}`;
 
   try {
     const response = await fetch(apiUrl, {
@@ -233,6 +238,7 @@ async function fetchSuperAdminUsers(gridApi) {
     }
 
     const data = await response.json();
+    console.log("data", data);
 
     data.errFlag === 1
       ? (window.location.href = "login.html")
@@ -241,10 +247,11 @@ async function fetchSuperAdminUsers(gridApi) {
     const formattedData = data.map((item, index) => ({
       index: index + 1,
       userName: item.username,
-      createdDate: formatDate(item.created_date),
       status: item.status,
       email: item.email,
       id: item.id,
+      customerName: item.customer_name,
+      customerId: item.customer_id,
     }));
     gridApi.setGridOption("rowData", formattedData);
   } catch (error) {
@@ -255,8 +262,7 @@ async function fetchSuperAdminUsers(gridApi) {
 
 async function toggleStatus(userId, newStatus) {
   const authToken = localStorage.getItem("authToken");
-  const apiUrl =
-    "https://stingray-app-4smpo.ondigitalocean.app/super-admin-users/update/status";
+  const apiUrl = "";
 
   const formData = new FormData();
   formData.append("token", authToken);
@@ -312,26 +318,8 @@ const gridOptions = {
       field: "email",
     },
     {
-      headerName: "Created Date",
-      field: "createdDate",
-      filter: "agDateColumnFilter",
-      filterParams: {
-        comparator: (filterLocalDateAtMidnight, cellValue) => {
-          const dateParts = cellValue.split("-");
-          const year = Number(dateParts[2]);
-          const month = Number(dateParts[1]) - 1;
-          const day = Number(dateParts[0]);
-          const cellDate = new Date(year, month, day);
-          // Compare dates
-          if (cellDate < filterLocalDateAtMidnight) {
-            return -1;
-          } else if (cellDate > filterLocalDateAtMidnight) {
-            return 1;
-          } else {
-            return 0;
-          }
-        },
-      },
+      headerName: "Customer Name",
+      field: "customerName",
     },
     {
       headerName: "Status",
@@ -400,7 +388,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const gridDiv = document.querySelector("#myGrid");
   gridApi = agGrid.createGrid(gridDiv, gridOptions);
 
-  fetchSuperAdminUsers(gridApi);
+  fetchUsers(gridApi);
 });
 
 function onBtnExport() {
@@ -416,4 +404,59 @@ function onBtnExport() {
       return params.value;
     },
   });
+}
+
+document.addEventListener("DOMContentLoaded", async function () {
+  const customerData = await fetchCustomerData();
+
+  if (customerData) {
+    console.log("Customer data:", customerData);
+    const option = document.createElement("option");
+    option.value = "";
+    option.textContent = "Select Customer";
+    customerId.appendChild(option);
+    customerData.forEach((customer) => {
+      const option = document.createElement("option");
+      option.value = customer.id;
+      option.textContent = customer.customer_name;
+      customerId.appendChild(option);
+    });
+
+    customerId.addEventListener("change", async function () {
+      const selectedCustomerId = this.value;
+      userData.customer_id = selectedCustomerId;
+      console.log({ selectedCustomerId, userData });
+    });
+  }
+});
+
+async function fetchCustomerData() {
+  const authToken = localStorage.getItem("authToken");
+  const apiUrl = `https://stingray-app-4smpo.ondigitalocean.app/customers/all/${authToken}`;
+
+  try {
+    const response = await fetch(apiUrl, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (data.errFlag === 1) {
+      window.location.href = "login.html";
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching customer data:", error);
+    window.location.href = "login.html";
+    return null;
+  }
 }
