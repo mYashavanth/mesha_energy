@@ -153,10 +153,17 @@ const gridOptions = {
   rowData: [],
   columnDefs: [
     {
-      headerName: "Device ID",
-      field: "deviceId",
-      sortable: true,
-      filter: true,
+        headerName: "Device ID",
+        field: "deviceId",
+        sortable: true,
+        filter: true,
+        onCellClicked: (params) => {
+            // Store the deviceId in local storage
+            localStorage.setItem("selectedDeviceId", params.value);
+            
+            // Redirect to index.html
+            window.location.href = "index.html";
+        }
     },
     {
       headerName: "Status",

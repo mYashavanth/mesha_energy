@@ -3,16 +3,16 @@ function loadNavBar() {
     <figure>
       <img src="./assets/images/index/logo.png" alt="logo" />
     </figure>
+    <div class="navItems" id="all_devices_link">
+      <i class="bi bi-pin-map" style="font-size: 20px"></i>
+      <p>All Devices</p>
+    </div>
     <div class="navContent">
       <div class="navItems" id="dashboard_link">
         <i class="bi bi-house-door" style="font-size: 20px"></i>
         <p>Dashboard</p>
       </div>
-      <div class="navItems" id="mesha_customer_management_link">
-        <i class="bi bi-person-workspace" style="font-size: 20px"></i>
-        <p>Mesha Customer Management</p>
-      </div>
-      <!-- <div class="accordion" id="accordionExample">
+      <div class="accordion" id="accordionExample">
         <div class="accordion-item">
           <h2 class="accordion-header">
             <button
@@ -23,8 +23,8 @@ function loadNavBar() {
               aria-expanded="false"
               aria-controls="flush-collapseOne"
             >
-              <i class="bi bi-ev-front" style="font-size: 20px"></i>
-              <p>Device Management</p>
+              <i class="bi bi-person-workspace" style="font-size: 20px"></i>
+              <p>Users and Role Management</p>
             </button>
           </h2>
           <div
@@ -32,38 +32,24 @@ function loadNavBar() {
             class="accordion-collapse collapse"
             data-bs-parent="#accordionExample"
           >
-            <div class="navItems" id="device_management-link">
-              <i
-                class="bi bi-house-door"
-                style="font-size: 20px; color: transparent"
-              ></i>
-              <p>Device Management</p>
+            <div class="navItems" id="mesha_customer_management_link">
+              <i class="bi bi-person-workspace" style="font-size: 20px; color:transparent"></i>
+              <p>Mesha Customer Management</p>
             </div>
-            <div class="navItems" id="customer_management_link">
-              <i 
-                class="bi bi-people" 
-                style="font-size: 20px; color: transparent"
-              ></i>
-              <p>Device Parameters</p>
+            <div class="navItems" id="customer_user_role_management_link">
+              <i class="bi bi-people" style="font-size: 20px; color:transparent" ></i>
+              <p>Customer User Role Management</p>
+            </div>
+            <div class="navItems" id="device_management-link">
+              <i class="bi bi-ev-front" style="font-size: 20px; color:transparent"></i>
+              <p>Device Management</p>
             </div>
           </div>
         </div>
-      </div> -->
-      <div class="navItems" id="customer_user_role_management_link">
-        <i class="bi bi-people" style="font-size: 20px;" ></i>
-        <p>Customer User Role Management</p>
-      </div>
-      <div class="navItems" id="device_management-link">
-        <i class="bi bi-ev-front" style="font-size: 20px"></i>
-        <p>Device Management</p>
       </div>
       <div class="navItems" id="super_user_role_management_link">
         <i class="bi bi-person-gear" style="font-size: 20px;" ></i>
         <p>Super User Role Management</p>
-      </div>
-      <div class="navItems" id="all_devices_link">
-        <i class="bi bi-pin-map" style="font-size: 20px"></i>
-        <p>All Devices</p>
       </div>
       <div class="navItems" id="profile_link">
         <i class="bi bi-person" style="font-size: 20px"></i>
@@ -134,7 +120,6 @@ function setActiveLink() {
     "/": "dashboard_link",
     "/index.html": "dashboard_link",
     "/mesha_customer_management.html": "mesha_customer_management_link",
-    "/customer-management": "customer_management_link",
     "/device_management.html": "device_management-link",
     "/customer_user_role_management.html": "customer_user_role_management_link",
     "/super_user_role_management.html": "super_user_role_management_link",
@@ -153,7 +138,11 @@ function setActiveLink() {
   }
 
   // Check if any of the accordion links are active and open the accordion if needed
-  const accordionLinks = ["/example.html", "/device_parameters.html"];
+  const accordionLinks = [
+    "/mesha_customer_management.html",
+    "/customer_user_role_management.html",
+    "/device_management.html",
+  ];
   const isAccordionActive = accordionLinks.includes(path);
 
   if (isAccordionActive) {
