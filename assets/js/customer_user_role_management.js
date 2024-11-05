@@ -124,7 +124,7 @@ class StatusCellRenderer {
 
 let isEditing = false;
 const userData = {
-  super_admin_id: "",
+  appUserId: "",
   customer_id: "",
   username: "",
   email: "",
@@ -147,7 +147,7 @@ function handleEdit(rowData) {
   isEditing = true;
   addUserBtn.innerText = "Update";
   console.log("Edit button clicked for:", rowData);
-  userData.super_admin_id = rowData.id;
+  userData.appUserId = rowData.id;
   userData.username = rowData.userName;
   userData.email = rowData.email;
   userData.customer_id = rowData.customerId;
@@ -170,7 +170,7 @@ const handleUserSubmit = async (event) => {
     addUserBtn.innerHTML = spinnerHTML;
     const apiUrl = !isEditing
       ? "https://stingray-app-4smpo.ondigitalocean.app/app-users-add"
-      : "";
+      : "https://stingray-app-4smpo.ondigitalocean.app/app-users-update";
 
     const formData = new FormData();
     formData.append("token", authToken);
@@ -180,7 +180,7 @@ const handleUserSubmit = async (event) => {
     formData.append("customer_id", userData.customer_id);
 
     if (isEditing) {
-      formData.append("super_admin_id", userData.super_admin_id);
+      formData.append("appUserId", userData.appUserId);
     }
 
     const response = await fetch(apiUrl, {
@@ -262,17 +262,11 @@ async function fetchUsers(gridApi) {
 
 async function toggleStatus(userId, newStatus) {
   const authToken = localStorage.getItem("authToken");
-  const apiUrl = "";
-
-  const formData = new FormData();
-  formData.append("token", authToken);
-  formData.append("status", newStatus);
-  formData.append("superUserId", userId);
+  const apiUrl = `https://stingray-app-4smpo.ondigitalocean.app/app-users-update/${authToken}/${userId}/${newStatus}`;
 
   try {
     const response = await fetch(apiUrl, {
-      method: "POST",
-      body: formData,
+      method: "GET",
     });
 
     if (!response.ok) {
