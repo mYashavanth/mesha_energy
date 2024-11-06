@@ -214,7 +214,7 @@
           <!-- speed card -->
           <div class="deviceDataCard">
             <div class="deviceDataCardContent">
-              <p>SPEED (KM/H)</p>
+              <p>INSTANTANEOUS SPEED</p>
               <h1 id="speed">0.00</h1>
             </div>
             <div class="deviceDataCardImg" style="background-color: #f5f6f7">
@@ -444,7 +444,7 @@
         const batteryVoltageOptions = {
           container: document.getElementById("batteryVoltageChart"),
           title: {
-            text: "Battery Voltages (b1, b2, b3, b4)",
+            text: "Individual Battery Voltage",
           },
           data: data,
           series: [
@@ -527,7 +527,7 @@
         const currentOptions = {
           container: document.getElementById("currentChart"),
           title: {
-            text: "Current Over Time",
+            text: "Current",
           },
           data: data,
           series: [
@@ -586,7 +586,7 @@
         const bankVoltageOptions = {
           container: document.getElementById("bankVoltageChart"),
           title: {
-            text: "Bank Voltage (Sum of b1, b2, b3, b4)",
+            text: "Bank Voltage",
           },
           data: data,
           series: [
