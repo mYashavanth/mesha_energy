@@ -13,6 +13,8 @@ document.addEventListener("DOMContentLoaded", async function () {
   const temperature = document.getElementById("temperature");
   const speed = document.getElementById("speed");
   const distance = document.getElementById("distance");
+  var lat;
+  var lng;
   // card Data elements
 
   let deviceIdDetais = await fetchDeviceData();
@@ -99,6 +101,15 @@ async function fetchDeviceData() {
   }
 }
 
+function convertToDecimalDegrees(coordinate) {
+  const degrees = Math.floor(coordinate / 100);
+  const minutes = coordinate - degrees * 100;
+
+  const decimalDegrees = degrees + minutes / 60;
+
+  return decimalDegrees;
+}
+
 async function fetchDeviceDetails(deviceId) {
   const authToken = localStorage.getItem("authToken");
   const apiUrl = `https://stingray-app-4smpo.ondigitalocean.app/dashboard/primary-data/${deviceId}/${authToken}`;
@@ -153,6 +164,8 @@ async function fetchDeviceDetails(deviceId) {
       current.textContent = deviceData[0].current;
       temperature.textContent = deviceData[0].temperature;
       speed.textContent = deviceData[0].speed;
+      lat = convertToDecimalDegrees(Number(deviceData[0].lat));
+      lng = convertToDecimalDegrees(Number(deviceData[0].long));
     } else {
       date.textContent = "";
       time.textContent = "";
@@ -187,7 +200,13 @@ function convertDateFormat(dateString) {
   return `${day}/${month}/${year}`;
 }
 
-function navigateToIndex() {
+function navigateToMap() {
+  // Add a URL parameter like `?showModal=true` to indicate the modal should be shown
+  // window.location.href = "all_devices.html?lat=" + lat + "&lng=" + lng;
+  window.location.href = `all_devices.html?lat=${lat}&lng=${lng}`;
+}
+
+function navigateToAllDevices() {
   // Add a URL parameter like `?showModal=true` to indicate the modal should be shown
   window.location.href = "all_devices.html?showModal=true";
 }

@@ -153,17 +153,17 @@ const gridOptions = {
   rowData: [],
   columnDefs: [
     {
-        headerName: "Device ID",
-        field: "deviceId",
-        sortable: true,
-        filter: true,
-        onCellClicked: (params) => {
-            // Store the deviceId in local storage
-            localStorage.setItem("selectedDeviceId", params.value);
-            
-            // Redirect to index.html
-            window.location.href = "index.html";
-        }
+      headerName: "Device ID",
+      field: "deviceId",
+      sortable: true,
+      filter: true,
+      onCellClicked: (params) => {
+        // Store the deviceId in local storage
+        localStorage.setItem("selectedDeviceId", params.value);
+
+        // Redirect to index.html
+        window.location.href = "index.html";
+      },
     },
     {
       headerName: "Status",
@@ -525,12 +525,16 @@ document.getElementById("dateModatCancel").addEventListener("click", () => {
   selectedDates = [];
 });
 
+// Check if the "showModal" query parameter is present
 document.addEventListener("DOMContentLoaded", function () {
-  // Check if `showModal=true` is in the URL
   const urlParams = new URLSearchParams(window.location.search);
+  console.log(urlParams);
+
   if (urlParams.get("showModal") === "true") {
-    // Initialize and show the Bootstrap modal
     var myModal = new bootstrap.Modal(document.getElementById("dateModal"));
     myModal.show();
+  } else if (urlParams.get("lat") && urlParams.get("lng")) {
+    console.log(urlParams.get("lat"), urlParams.get("lng"));
+    openMapModal(Number(urlParams.get("lat")), Number(urlParams.get("lng")));
   }
 });
