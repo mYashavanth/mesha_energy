@@ -253,6 +253,8 @@ async function fetchUsers(gridApi) {
       customerName: item.customer_name,
       customerId: item.customer_id,
     }));
+    console.log({ formattedData });
+    
     gridApi.setGridOption("rowData", formattedData);
   } catch (error) {
     console.error("Error fetching customer data:", error);

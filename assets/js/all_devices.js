@@ -166,17 +166,58 @@ const gridOptions = {
       },
     },
     {
-      headerName: "Status",
-      field: "status",
-      filter: false,
-      sortable: false,
-      maxWidth: 90,
-      cellRenderer: () => {
-        return `<span style="color: green; font-weight: bold; border: 1px solid green; padding: 5px; border-radius: 5px; background-color: rgb(213, 255, 213)">Active</span>`;
-      },
-      sortable: false,
-      filter: false,
-    },
+  headerName: "Status",
+  field: "status",
+  filter: false,
+  sortable: false,
+  maxWidth: 100,
+  cellRenderer: (params) => {
+    const deviceLogDate = params.data.deviceLogDate; // e.g., "09/10/2024"
+    const logTime = params.data.time; // e.g., "23:38"
+
+    // Get the current date and time components separately
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth() + 1; // months are 0-based
+    const currentDay = currentDate.getDate();
+    const currentHours = currentDate.getHours();
+    const currentMinutes = currentDate.getMinutes();
+
+    // Parse the deviceLogDate and time separately
+    const [logDay, logMonth, logYear] = deviceLogDate.split("/").map(Number); // "MM/DD/YYYY" format
+    const [logHours, logMinutes] = logTime.split(":").map(Number); // "HH:MM" format
+    
+    let statusText = "Online";
+    let backgroundColor = "rgb(213, 255, 213)"; // Green background
+
+    // Compare the dates
+    if (
+      logYear < currentYear ||
+      (logYear === currentYear && logMonth < currentMonth) ||
+      (logYear === currentYear && logMonth === currentMonth && logDay < currentDay)
+    ) {
+      // Device date is in the past
+      statusText = "Offline";
+      backgroundColor = "gray";
+    } else if (
+      logYear === currentYear &&
+      logMonth === currentMonth &&
+      logDay === currentDay
+    ) {
+      // If the date is today, compare the times
+      const timeDifference = (currentHours - logHours) * 60 + (currentMinutes - logMinutes); // difference in minutes
+      
+      if (timeDifference >= 5) {
+        statusText = "Offline";
+        backgroundColor = "gray";
+      }
+    }
+
+    return `<span style="color: ${statusText === "Online" ? "green" : "black"}; font-weight: bold; border: 1px solid ${
+      statusText === "Online" ? "green" : "gray"
+    }; padding: 5px; border-radius: 5px; background-color: ${backgroundColor}">${statusText}</span>`;
+  },
+},
     {
       headerName: "B1",
       field: "v1",
@@ -528,7 +569,7 @@ document.getElementById("dateModatCancel").addEventListener("click", () => {
 // Check if the "showModal" query parameter is present
 document.addEventListener("DOMContentLoaded", function () {
   const urlParams = new URLSearchParams(window.location.search);
-  console.log(urlParams);
+  // console.log(urlParams);
 
   if (urlParams.get("showModal") === "true") {
     var myModal = new bootstrap.Modal(document.getElementById("dateModal"));
