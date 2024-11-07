@@ -186,3 +186,8 @@ function convertDateFormat(dateString) {
 
   return `${day}/${month}/${year}`;
 }
+
+function navigateToIndex() {
+  // Add a URL parameter like `?showModal=true` to indicate the modal should be shown
+  window.location.href = "all_devices.html?showModal=true";
+}

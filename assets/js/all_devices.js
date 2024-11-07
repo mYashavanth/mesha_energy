@@ -524,3 +524,13 @@ document.getElementById("dateModatCancel").addEventListener("click", () => {
   document.getElementById("dateRange")._flatpickr.clear();
   selectedDates = [];
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+  // Check if `showModal=true` is in the URL
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get("showModal") === "true") {
+    // Initialize and show the Bootstrap modal
+    var myModal = new bootstrap.Modal(document.getElementById("dateModal"));
+    myModal.show();
+  }
+});
