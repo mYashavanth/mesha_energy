@@ -536,6 +536,7 @@ const gridOptions = {
       filter: false,
       maxWidth: 150,
       suppressAutoSize: true,
+      cellStyle: { textAlign: "center" },
       cellRenderer: function (params) {
         return `<button 
                   type="button" 
