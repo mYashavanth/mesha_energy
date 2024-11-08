@@ -229,7 +229,9 @@ const gridOptions = {
     {
       headerName: "Alert",
       field: "alert",
-      maxWidth: 100,
+      maxWidth: 70,
+      filter: false,
+      sortable: false,
       cellStyle: { textAlign: "center" },
       cellRenderer: (params) => {
         const customerId = localStorage.getItem("selectedCustomerId");
@@ -317,7 +319,9 @@ const gridOptions = {
     {
       headerName: "Bank Voltage",
       field: "bankVoltage",
-      maxWidth: 140,
+      filter: false,
+      sortable: false,
+      maxWidth: 130,
     },
     {
       headerName: "A",
@@ -407,7 +411,7 @@ const gridOptions = {
         const long = params.data.long;
         return `<button 
               type="button"
-              class="btn btn-outline-success mt-2"
+              class="btn btn-outline-success btn-sm mt-2"
               onclick="openMapModal(${lat}, ${long})"
             >View</button>`;
       },
