@@ -157,6 +157,7 @@ const gridOptions = {
       field: "deviceId",
       sortable: true,
       filter: true,
+      maxWidth: 150,
       onCellClicked: (params) => {
         // Store the deviceId in local storage
         localStorage.setItem("selectedDeviceId", params.value);
@@ -166,58 +167,133 @@ const gridOptions = {
       },
     },
     {
-  headerName: "Status",
-  field: "status",
-  filter: false,
-  sortable: false,
-  maxWidth: 100,
-  cellRenderer: (params) => {
-    const deviceLogDate = params.data.deviceLogDate; // e.g., "09/10/2024"
-    const logTime = params.data.time; // e.g., "23:38"
+      headerName: "Status",
+      field: "status",
+      filter: false,
+      sortable: false,
+      maxWidth: 100,
+      cellRenderer: (params) => {
+        const deviceLogDate = params.data.deviceLogDate; // e.g., "09/10/2024"
+        const logTime = params.data.time; // e.g., "23:38"
 
-    // Get the current date and time components separately
-    const currentDate = new Date();
-    const currentYear = currentDate.getFullYear();
-    const currentMonth = currentDate.getMonth() + 1; // months are 0-based
-    const currentDay = currentDate.getDate();
-    const currentHours = currentDate.getHours();
-    const currentMinutes = currentDate.getMinutes();
+        // Get the current date and time components separately
+        const currentDate = new Date();
+        const currentYear = currentDate.getFullYear();
+        const currentMonth = currentDate.getMonth() + 1; // months are 0-based
+        const currentDay = currentDate.getDate();
+        const currentHours = currentDate.getHours();
+        const currentMinutes = currentDate.getMinutes();
 
-    // Parse the deviceLogDate and time separately
-    const [logDay, logMonth, logYear] = deviceLogDate.split("/").map(Number); // "MM/DD/YYYY" format
-    const [logHours, logMinutes] = logTime.split(":").map(Number); // "HH:MM" format
-    
-    let statusText = "Online";
-    let backgroundColor = "rgb(213, 255, 213)"; // Green background
+        // Parse the deviceLogDate and time separately
+        const [logDay, logMonth, logYear] = deviceLogDate
+          .split("/")
+          .map(Number); // "MM/DD/YYYY" format
+        const [logHours, logMinutes] = logTime.split(":").map(Number); // "HH:MM" format
 
-    // Compare the dates
-    if (
-      logYear < currentYear ||
-      (logYear === currentYear && logMonth < currentMonth) ||
-      (logYear === currentYear && logMonth === currentMonth && logDay < currentDay)
-    ) {
-      // Device date is in the past
-      statusText = "Offline";
-      backgroundColor = "gray";
-    } else if (
-      logYear === currentYear &&
-      logMonth === currentMonth &&
-      logDay === currentDay
-    ) {
-      // If the date is today, compare the times
-      const timeDifference = (currentHours - logHours) * 60 + (currentMinutes - logMinutes); // difference in minutes
-      
-      if (timeDifference >= 5) {
-        statusText = "Offline";
-        backgroundColor = "gray";
-      }
-    }
+        let statusText = "Online";
+        let backgroundColor = "rgb(213, 255, 213)"; // Green background
 
-    return `<span style="color: ${statusText === "Online" ? "green" : "black"}; font-weight: bold; border: 1px solid ${
-      statusText === "Online" ? "green" : "gray"
-    }; padding: 5px; border-radius: 5px; background-color: ${backgroundColor}">${statusText}</span>`;
-  },
-},
+        // Compare the dates
+        if (
+          logYear < currentYear ||
+          (logYear === currentYear && logMonth < currentMonth) ||
+          (logYear === currentYear &&
+            logMonth === currentMonth &&
+            logDay < currentDay)
+        ) {
+          // Device date is in the past
+          statusText = "Offline";
+          backgroundColor = "#EFEFEF";
+        } else if (
+          logYear === currentYear &&
+          logMonth === currentMonth &&
+          logDay === currentDay
+        ) {
+          // If the date is today, compare the times
+          const timeDifference =
+            (currentHours - logHours) * 60 + (currentMinutes - logMinutes); // difference in minutes
+
+          if (timeDifference >= 5) {
+            statusText = "Offline";
+            backgroundColor = "#EFEFEF";
+          }
+        }
+
+        return `<span style="color: ${
+          statusText === "Online" ? "green" : "#0D5E36"
+        };  border: 1px solid ${
+          statusText === "Online" ? "#0D5E36" : "gray"
+        }; padding: 5px; border-radius: 5px; background-color: ${backgroundColor}">${statusText}</span>`;
+      },
+    },
+    {
+      headerName: "Alert",
+      field: "alert",
+      maxWidth: 100,
+      cellStyle: { textAlign: "center" },
+      cellRenderer: (params) => {
+        const customerId = localStorage.getItem("selectedCustomerId");
+        const authToken = localStorage.getItem("authToken");
+        const voltageApiUrl = `https://stingray-app-4smpo.ondigitalocean.app/voltage-settings/${customerId}/${authToken}`;
+        const alertDiv = document.createElement("div");
+
+        fetch(voltageApiUrl, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((response) => {
+            if (!response.ok) throw new Error(`Error: ${response.status}`);
+            return response.json();
+          })
+          .then((voltageData) => {
+            // Check if voltageData is empty or undefined
+            if (!voltageData || voltageData.length === 0) {
+              // If empty, display a gray circle
+              alertDiv.innerHTML = `<span style="display: inline-block; width: 12px; height: 12px; background-color: gray; border-radius: 50%;"></span>`;
+              return;
+            }
+
+            const voltageSettings = voltageData[0];
+            const { v1, v2, v3, v4 } = params.data;
+            const checkAlert = (value, low, high) =>
+              value < parseFloat(low) || value > parseFloat(high);
+
+            const isAlert = [
+              checkAlert(v1, voltageSettings.v1_low, voltageSettings.v1_high),
+              checkAlert(v2, voltageSettings.v2_low, voltageSettings.v2_high),
+              checkAlert(v3, voltageSettings.v3_low, voltageSettings.v3_high),
+              checkAlert(v4, voltageSettings.v4_low, voltageSettings.v4_high),
+            ].some(Boolean);
+
+            const allZero = [
+              "v1_high",
+              "v1_low",
+              "v2_high",
+              "v2_low",
+              "v3_high",
+              "v3_low",
+              "v4_high",
+              "v4_low",
+            ].every((key) => parseFloat(voltageSettings[key]) === 0);
+
+            if (allZero) {
+              alertDiv.innerHTML = `<span style="display: inline-block; width: 12px; height: 12px; background-color: gray; border-radius: 50%;"></span>`;
+            } else {
+              alertDiv.innerHTML = `<span style="display: inline-block; width: 12px; height: 12px; background-color: ${
+                isAlert ? "red" : "green"
+              }; border-radius: 50%;"></span>`;
+            }
+          })
+          .catch((error) => {
+            console.error("Error fetching voltage settings:", error);
+            alertDiv.innerHTML = `<span style="color: red;">Error</span>`;
+          });
+
+        return alertDiv;
+      },
+    },
     {
       headerName: "B1",
       field: "v1",

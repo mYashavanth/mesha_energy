@@ -2,6 +2,9 @@ const addCustomerBtn = document.getElementById("addCustomerBtn");
 const customerInput = document.getElementById("customerName");
 const companyAddressInput = document.getElementById("companyAddress");
 const inputValidationMsg = document.getElementById("inputValidationMsg");
+const voltageInputValidationMsg = document.getElementById(
+  "voltageInputValidationMsg"
+);
 const spinnerHTML = `
     <div class="spinner-border spinner-border-sm" role="status">
       <span class="visually-hidden">Loading...</span>
@@ -52,6 +55,171 @@ const validateInputs = () => {
 
   return valid;
 };
+const voltageGroups = [
+  {
+    low: document.getElementById("v1_low"),
+    high: document.getElementById("v1_high"),
+  },
+  {
+    low: document.getElementById("v2_low"),
+    high: document.getElementById("v2_high"),
+  },
+  {
+    low: document.getElementById("v3_low"),
+    high: document.getElementById("v3_high"),
+  },
+  {
+    low: document.getElementById("v4_low"),
+    high: document.getElementById("v4_high"),
+  },
+];
+
+const validateVoltageInputs = () => {
+  let valid = true;
+  let validationMsg = "";
+
+  const numberRegex = /^-?\d+(\.\d+)?$/; // Regex to match positive/negative numbers with decimal
+
+  // Loop through each voltage group
+  voltageGroups.forEach((group) => {
+    const lowValue = group.low.value.trim();
+    const highValue = group.high.value.trim();
+    const lowId = group.low.id; // Get the id of the low input
+    const highId = group.high.id; // Get the id of the high input
+
+    // Check if low or high value is empty
+    if (!lowValue) {
+      validationMsg += `${lowId} cannot be empty.\n`;
+      valid = false;
+      group.low.style.borderColor = "red";
+    } else if (!numberRegex.test(lowValue)) {
+      validationMsg += `${lowId} must be a valid number.\n`;
+      valid = false;
+      group.low.style.borderColor = "red";
+    } else {
+      group.low.style.borderColor = ""; // Clear error styling
+    }
+
+    if (!highValue) {
+      validationMsg += `${highId} cannot be empty.\n`;
+      valid = false;
+      group.high.style.borderColor = "red";
+    } else if (!numberRegex.test(highValue)) {
+      validationMsg += `${highId} must be a valid number.\n`;
+      valid = false;
+      group.high.style.borderColor = "red";
+    } else {
+      group.high.style.borderColor = ""; // Clear error styling
+    }
+
+    // Check if low value is less than high value
+    if (
+      numberRegex.test(lowValue) &&
+      numberRegex.test(highValue) &&
+      parseFloat(lowValue) >= parseFloat(highValue)
+    ) {
+      validationMsg += `${lowId} should be less than ${highId}.\n`;
+      valid = false;
+      group.low.style.borderColor = "red";
+      group.high.style.borderColor = "red";
+    }
+  });
+
+  // Display or clear validation message
+  if (validationMsg) {
+    voltageInputValidationMsg.innerText = validationMsg;
+    voltageInputValidationMsg.style.display = "block"; // Show message
+  } else {
+    voltageInputValidationMsg.style.display = "none"; // Hide message if valid
+  }
+
+  return valid;
+};
+let voltageGroupsErrors = voltageGroups.reverse();
+const focusOnVoltageFirstError = () => {
+  voltageGroupsErrors.forEach((group, index) => {
+    console.log({ group });
+
+    if (group.low.style.borderColor === "red") {
+      group.low.focus();
+    } else if (group.high.style.borderColor === "red") {
+      group.high.focus();
+    }
+  });
+};
+const voltageData = {
+  customerId: "",
+  v1_low: "",
+  v1_high: "",
+  v2_low: "",
+  v2_high: "",
+  v3_low: "",
+  v3_high: "",
+  v4_low: "",
+  v4_high: "",
+};
+const handleVoltagechange = (event) => {
+  voltageData[event.target.name] = event.target.value;
+};
+function setThreshold(rowData) {
+  console.log(rowData.customerId);
+  voltageData.customerId = rowData.customerId;
+  voltageGroups.forEach((group) => {
+    group.low.value = "";
+    group.high.value = "";
+  })
+}
+const handleVoltageSubmit = async (event) => {
+  event.preventDefault();
+
+  // Run validation
+  if (validateVoltageInputs()) {
+    try {
+      const apiUrl =
+        "https://stingray-app-4smpo.ondigitalocean.app/voltage-settings";
+
+      const authToken = localStorage.getItem("authToken");
+      const formData = new FormData();
+      formData.append("v1L", voltageData.v1_low);
+      formData.append("v1H", voltageData.v1_high);
+      formData.append("v2L", voltageData.v2_low);
+      formData.append("v2H", voltageData.v2_high);
+      formData.append("v3L", voltageData.v3_low);
+      formData.append("v3H", voltageData.v3_high);
+      formData.append("v4L", voltageData.v4_low);
+      formData.append("v4H", voltageData.v4_high);
+      formData.append("token", authToken);
+      formData.append("customerId", voltageData.customerId);
+
+      const response = await fetch(apiUrl, {
+        method: "POST",
+        body: formData,
+      });
+      const data = await response.json();
+      console.log({ data });
+      if (data.errFlag === 0) {
+        triggerToast("Threshold updated successfully!", "success");
+        closeVoltageModal();
+      } else {
+        triggerToast("Not authorized", "error");
+        closeVoltageModal();
+      }
+    } catch (error) {}
+  } else {
+    focusOnVoltageFirstError();
+    console.log("Validation failed.");
+  }
+};
+
+const clearVoltageError = (event) => {
+  const inputField = event.target;
+  inputField.style.borderColor = ""; // Clear error styling
+  voltageInputValidationMsg.style.display = "none"; // Hide error message
+};
+voltageGroups.forEach((group, index) => {
+  group.low.addEventListener("input", clearVoltageError);
+  group.high.addEventListener("input", clearVoltageError);
+});
 
 // Focus on the first invalid field
 const focusOnFirstError = () => {
@@ -197,6 +365,13 @@ function closeModal() {
     modal.hide();
   }
 }
+function closeVoltageModal() {
+  const modalElement = document.getElementById("ThresholdModal");
+  const modal = bootstrap.Modal.getInstance(modalElement);
+  if (modal) {
+    modal.hide();
+  }
+}
 const handlechange = (event) => {
   customerData[event.target.name] = event.target.value;
 };
@@ -270,14 +445,26 @@ async function toggleStatus(customerId, newStatus) {
     return false;
   } catch (error) {
     console.error("Error updating customer status:", error);
-    triggerErrorToast("Please check your internet connection and try again.");
+    triggerToast("Please check your internet connection and try again.", "error");
     return false;
   }
 }
-function triggerErrorToast(message) {
-  const toastElement = document.getElementById("errorToast");
+function triggerToast(message, type = "error") {
+  const toastElement = document.getElementById("toastNotification");
   const toastMessageElement = document.getElementById("toastMessage");
+
+  // Set the message text
   toastMessageElement.textContent = message;
+
+  // Remove any existing background class and add the appropriate one
+  toastElement.classList.remove("bg-danger", "bg-success");
+  if (type === "success") {
+    toastElement.classList.add("bg-success");
+  } else {
+    toastElement.classList.add("bg-danger");
+  }
+
+  // Show the toast
   const toast = new bootstrap.Toast(toastElement);
   toast.show();
 }
@@ -342,6 +529,25 @@ const gridOptions = {
       maxWidth: 150,
       suppressAutoSize: true,
       cellRenderer: StatusCellRenderer,
+    },
+    {
+      headerName: "Set Threshold",
+      field: "id",
+      filter: false,
+      maxWidth: 150,
+      suppressAutoSize: true,
+      cellRenderer: function (params) {
+        return `<button 
+                  type="button" 
+                  style="margin-top:10px;" 
+                  data-bs-toggle="modal"
+                  data-bs-target="#ThresholdModal"
+                  class="btn btn-light" 
+                  onclick='setThreshold(${JSON.stringify(params.data)})'
+                >
+                  <i class="bi bi-plus-circle"></i>
+                </button>`;
+      },
     },
     {
       headerName: "Action",

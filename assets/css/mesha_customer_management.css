@@ -117,31 +117,40 @@ input:checked + .slider:before {
 }
 /* ag grid styles end */
 /* modal styling start */
-.modalInputs {
+.modalInputs, .thresholdModalInputs {
   /* border: 1px solid black; */
   display: flex;
   flex-direction: column;
   gap: 16px;
   padding: 0 16px;
 }
-.modalInput input:focus {
+.modalInput input:focus, .thresholdModalInput input:focus {
   outline: none !important;
   box-shadow: none !important;
   border: 1px solid #0d5e36;
 }
-.modalInput select:focus {
+.modalInput select:focus, .thresholdModalInput select:focus {
   outline: none !important;
   box-shadow: none !important;
   border: 1px solid #0d5e36;
 }
-.modal-footer {
+.modal-footer, .thresholdModalFooter {
   display: flex !important;
   justify-content: space-between !important;
   /* border: 1px solid black !important; */
   padding: 16px 28px !important;
 }
-.modal-footer button {
+.modal-footer button, .thresholdModalFooter button {
   min-width: 100px !important;
+}
+
+.thresholdModalInputContainer{
+  display: flex;
+  flex-direction: column;
+}
+.thresholdModalInputGroup{
+  display: flex;
+  gap: 16px;
 }
 
 /* modal styling end */
