@@ -163,11 +163,44 @@ const handleVoltagechange = (event) => {
 };
 function setThreshold(rowData) {
   console.log(rowData.customerId);
-  voltageData.customerId = rowData.customerId;
+  const customerId = rowData.customerId;
+  const authToken = localStorage.getItem("authToken");
+  const voltageApiUrl = `https://stingray-app-4smpo.ondigitalocean.app/voltage-settings/${customerId}/${authToken}`;
+
+  // Clear all fields initially
   voltageGroups.forEach((group) => {
     group.low.value = "";
     group.high.value = "";
+  });
+
+  // Make the API call
+  fetch(voltageApiUrl, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
   })
+    .then((response) => {
+      if (!response.ok) throw new Error(`Error: ${response.status}`);
+      return response.json();
+    })
+    .then((voltageData) => {
+      // Check if the array is empty
+      if (voltageData.length === 0) {
+        return; // Leave the fields as empty
+      }
+
+      // Set values for each voltage group
+      const voltageSettings = voltageData[0];
+      voltageGroups.forEach((group, index) => {
+        group.low.value = voltageSettings[`v${index + 1}_low`] || "";
+        group.high.value = voltageSettings[`v${index + 1}_high`] || "";
+      });
+    })
+    .catch((error) => {
+      console.error("Error fetching voltage settings:", error);
+      // Handle error if necessary, but fields remain empty
+    });
 }
 const handleVoltageSubmit = async (event) => {
   event.preventDefault();
@@ -445,7 +478,10 @@ async function toggleStatus(customerId, newStatus) {
     return false;
   } catch (error) {
     console.error("Error updating customer status:", error);
-    triggerToast("Please check your internet connection and try again.", "error");
+    triggerToast(
+      "Please check your internet connection and try again.",
+      "error"
+    );
     return false;
   }
 }
