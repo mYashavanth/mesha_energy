@@ -124,6 +124,11 @@ input:checked + .slider:before {
   gap: 16px;
   padding: 0 16px;
 }
+.modalInput {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
 .modalInput input:focus, .thresholdModalInput input:focus {
   outline: none !important;
   box-shadow: none !important;

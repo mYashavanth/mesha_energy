@@ -340,10 +340,6 @@ const gridOptions = {
       maxWidth: 150,
       suppressAutoSize: true,
       cellRenderer: StatusCellRenderer,
-      cellClassRules: {
-        "disabled-cell": (params) =>
-          params.data.email === localStorage.getItem("userEmail"),
-      },
     },
     {
       headerName: "Action",
@@ -364,10 +360,6 @@ const gridOptions = {
                   <i class="bi bi-pencil-square"></i>
                 </button>`;
       },
-      cellClassRules: {
-        "disabled-cell": (params) =>
-          params.data.email === localStorage.getItem("userEmail"),
-      },
     },
   ],
 
@@ -382,7 +374,8 @@ const gridOptions = {
     },
     cellClassRules: {
       "disabled-cell": (params) =>
-        params.data.email === localStorage.getItem("userEmail"),
+        params.data.email === localStorage.getItem("userEmail") ||
+        params.data.id === 1,
     },
   },
   domLayout: "autoHeight",

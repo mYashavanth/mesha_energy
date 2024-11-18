@@ -80,6 +80,13 @@ figure img {
   border-radius: 0 !important;
   box-shadow: 0 !important;
 }
+#flush-collapseTwo {
+  border: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: 0 !important;
+}
 .accordion-button {
   color: #626c70 !important;
   background-color: white !important;

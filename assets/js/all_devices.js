@@ -220,7 +220,7 @@ const gridOptions = {
         }
 
         return `<span style="color: ${
-          statusText === "Online" ? "green" : "#0D5E36"
+          statusText === "Online" ? "#0D5E36" : "gray"
         };  border: 1px solid ${
           statusText === "Online" ? "#0D5E36" : "gray"
         }; padding: 5px; border-radius: 5px; background-color: ${backgroundColor}">${statusText}</span>`;

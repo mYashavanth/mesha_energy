@@ -68,20 +68,20 @@
           <div class="gridTopSectionBtns">
             <button
               type="button"
+              class="btn btn-outline-success"
+              onclick="onBtnExport()"
+            >
+              <i class="bi bi-file-earmark-arrow-down"></i> Download CSV export
+              file
+            </button>
+            <button
+              type="button"
               class="btn btn-success"
               data-bs-toggle="modal"
               data-bs-target="#userModal"
               onclick="onBtnAdd()"
             >
               <i class="bi bi-plus-circle"></i> Add New User
-            </button>
-            <button
-              type="button"
-              class="btn btn-outline-success"
-              onclick="onBtnExport()"
-            >
-              <i class="bi bi-file-earmark-arrow-down"></i> Download CSV export
-              file
             </button>
           </div>
         </div>
@@ -161,7 +161,7 @@
             <div class="modal-footer">
               <button
                 type="button"
-                class="btn btn-secondary"
+                class="btn btn-light"
                 data-bs-dismiss="modal"
               >
                 Cancel
@@ -175,7 +175,7 @@
       </div>
     </div>
     <!-- modal -->
-     <!-- toast start -->
+    <!-- toast start -->
     <div
       id="errorToast"
       class="toast bg-danger text-white position-fixed top-0 end-0 m-3"
