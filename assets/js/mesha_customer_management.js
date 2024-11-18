@@ -237,7 +237,9 @@ const handleVoltageSubmit = async (event) => {
         triggerToast("Not authorized", "error");
         closeVoltageModal();
       }
-    } catch (error) {}
+    } catch (error) {
+      console.error("Error updating voltage settings:", error);
+    }
   } else {
     focusOnVoltageFirstError();
     console.log("Validation failed.");
