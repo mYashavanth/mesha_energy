@@ -3,6 +3,7 @@ const usernameInput = document.getElementById("username");
 const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
 const inputValidationMsg = document.getElementById("inputValidationMsg");
+const roleId = document.getElementById("roleId");
 const spinnerHTML = `
     <div class="spinner-border spinner-border-sm" role="status">
       <span class="visually-hidden">Loading...</span>
@@ -56,6 +57,15 @@ const validateInputs = () => {
     passwordInput.style.borderColor = ""; // Clear error styling
   }
 
+  // Validate role ID
+  if (!roleId.value.trim()) {
+    validationMsg += "Role ID cannot be empty.\n";
+    valid = false;
+    roleId.style.borderColor = "red";
+  } else {
+    roleId.style.borderColor = ""; // Clear error styling
+  }
+
   // Display or clear validation message
   if (validationMsg) {
     inputValidationMsg.innerText = validationMsg;
@@ -86,6 +96,7 @@ const clearErrorMessages = (event) => {
 usernameInput.addEventListener("input", clearErrorMessages);
 emailInput.addEventListener("input", clearErrorMessages);
 passwordInput.addEventListener("input", clearErrorMessages);
+roleId.addEventListener("input", clearErrorMessages);
 class StatusCellRenderer {
   init(params) {
     this.eGui = document.createElement("div");
@@ -135,6 +146,7 @@ const userData = {
   username: "",
   email: "",
   password: "",
+  roleId: "",
 };
 const onBtnAdd = () => {
   isEditing = false;
@@ -142,9 +154,11 @@ const onBtnAdd = () => {
   userData.username = "";
   userData.email = "";
   userData.password = "";
+  userData.roleId = "";
   usernameInput.value = "";
   emailInput.value = "";
   passwordInput.value = "";
+  roleId.value = "";
 };
 function handleEdit(rowData) {
   isEditing = true;
@@ -153,9 +167,11 @@ function handleEdit(rowData) {
   userData.super_admin_id = rowData.id;
   userData.username = rowData.userName;
   userData.email = rowData.email;
+  userData.roleId = rowData.roleId;
   usernameInput.value = rowData.userName;
   emailInput.value = rowData.email;
   passwordInput.value = "";
+  roleId.value = rowData.roleId;
 }
 const handleUserSubmit = async (event) => {
   event.preventDefault();
@@ -178,7 +194,16 @@ const handleUserSubmit = async (event) => {
     formData.append("username", userData.username);
     formData.append("email", userData.email);
     formData.append("password", userData.password);
-
+    formData.append("roleId", Number(userData.roleId));
+    console.log({
+      token: authToken,
+      username: userData.username,
+      email: userData.email,
+      password: userData.password,
+      roleId: Number(userData.roleId),
+      super_admin_id: userData.super_admin_id,
+    });
+    
     if (isEditing) {
       formData.append("super_admin_id", userData.super_admin_id);
     }
@@ -202,7 +227,7 @@ const handleUserSubmit = async (event) => {
     console.error("Error occurred during submission:", error);
   } finally {
     addUserBtn.disabled = false;
-    addUserBtn.innerHTML = "Add";
+    addUserBtn.innerHTML = isEditing ? "Update" : "Add";
   }
 };
 
@@ -245,6 +270,8 @@ async function fetchSuperAdminUsers(gridApi) {
       status: item.status,
       email: item.email,
       id: item.id,
+      roleId: item.role_id,
+      roleName: item.user_role_name,
     }));
     gridApi.setGridOption("rowData", formattedData);
   } catch (error) {
@@ -310,6 +337,10 @@ const gridOptions = {
     {
       headerName: "Email",
       field: "email",
+    },
+    {
+      headerName: "Role",
+      field: "roleName",
     },
     {
       headerName: "Created Date",
@@ -409,4 +440,59 @@ function onBtnExport() {
       return params.value;
     },
   });
+}
+
+document.addEventListener("DOMContentLoaded", async function () {
+  const userRoleData = await fetchUserRoleData();
+
+  if (userRoleData) {
+    console.log("User Role data:", userRoleData);
+    const option = document.createElement("option");
+    option.value = "";
+    option.textContent = "Select User Role";
+    roleId.appendChild(option);
+    userRoleData.forEach((userRole) => {
+      const option = document.createElement("option");
+      option.value = userRole.id;
+      option.textContent = userRole.user_role_name;
+      roleId.appendChild(option);
+    });
+
+    roleId.addEventListener("change", async function () {
+      const selectedRoleId = this.value;
+      userData.roleId = selectedRoleId;
+      console.log({ selectedRoleId, userData });
+    });
+  }
+});
+
+async function fetchUserRoleData() {
+  const authToken = localStorage.getItem("authToken");
+  const apiUrl = `https://stingray-app-4smpo.ondigitalocean.app/super-admin-roles/all/${authToken}`;
+
+  try {
+    const response = await fetch(apiUrl, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (data.errFlag === 1) {
+      window.location.href = "login.html";
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching customer data:", error);
+    window.location.href = "login.html";
+    return null;
+  }
 }

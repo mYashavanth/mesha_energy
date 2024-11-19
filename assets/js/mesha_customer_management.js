@@ -164,6 +164,7 @@ const handleVoltagechange = (event) => {
 function setThreshold(rowData) {
   console.log(rowData.customerId);
   const customerId = rowData.customerId;
+  voltageData.customerId = customerId;  
   const authToken = localStorage.getItem("authToken");
   const voltageApiUrl = `https://stingray-app-4smpo.ondigitalocean.app/voltage-settings/${customerId}/${authToken}`;
 
@@ -184,18 +185,29 @@ function setThreshold(rowData) {
       if (!response.ok) throw new Error(`Error: ${response.status}`);
       return response.json();
     })
-    .then((voltageData) => {
+    .then((voltData) => {
       // Check if the array is empty
-      if (voltageData.length === 0) {
+      if (voltData.length === 0) {
         return; // Leave the fields as empty
       }
 
       // Set values for each voltage group
-      const voltageSettings = voltageData[0];
+      const voltageSettings = voltData[0];
       voltageGroups.forEach((group, index) => {
-        group.low.value = voltageSettings[`v${index + 1}_low`] || "";
-        group.high.value = voltageSettings[`v${index + 1}_high`] || "";
+        document.getElementById(`v${index + 1}_low`).value =
+          voltageSettings[`v${index + 1}_low`] || "";
+        document.getElementById(`v${index + 1}_high`).value =
+          voltageSettings[`v${index + 1}_high`] || "";
       });
+      //  set values for voltageData
+      voltageData.v1_low = voltageSettings.v1_low;
+      voltageData.v1_high = voltageSettings.v1_high;
+      voltageData.v2_low = voltageSettings.v2_low;
+      voltageData.v2_high = voltageSettings.v2_high;
+      voltageData.v3_low = voltageSettings.v3_low;
+      voltageData.v3_high = voltageSettings.v3_high;
+      voltageData.v4_low = voltageSettings.v4_low;
+      voltageData.v4_high = voltageSettings.v4_high;
     })
     .catch((error) => {
       console.error("Error fetching voltage settings:", error);
