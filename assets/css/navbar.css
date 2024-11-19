@@ -25,12 +25,13 @@ figure img {
   border-right: 1px solid lightblue;
 } */
 .navItems {
-  padding: 10px 24px;
+  padding: 10px 24px 10px 18px;
   /* border-top: 1px solid lightgray; */
   display: flex;
   align-items: center;
   gap: 10px;
   cursor: pointer;
+  border-left: 6px solid transparent;
 }
 .navItems p {
   margin-bottom: -5px;
@@ -93,7 +94,8 @@ figure img {
   transition: background-color 0.3s ease !important;
   border-radius: 0 !important;
   box-shadow: 0 !important;
-  padding-left: 24px !important;
+  padding-left: 18px !important;
+  border-left: 6px solid transparent !important;
 }
 
 .accordion-button:not(.collapsed) {
@@ -101,7 +103,7 @@ figure img {
   background-color: #ecfff6 !important;
   border-left: 6px solid #0d5e36 !important;
   border-radius: 0 !important;
-  padding-left: 24px !important;
+  padding-left: 18px !important;
   /* border: 1px solid #0d5e36 !important; */
 }
 .accordion-button:not(.collapsed) p,
