@@ -52,9 +52,7 @@ const clearErrorMessages = (event) => {
 };
 
 userRoleNameInput.addEventListener("input", clearErrorMessages);
-document
-  .querySelector("#modulesCheckbox")
-  .addEventListener("click", clearErrorMessages);
+modulesCheckbox.addEventListener("click", clearErrorMessages);
 
 let isEditing = false;
 const userRoleData = {
@@ -146,7 +144,6 @@ const handleUserRoleSubmit = async (event) => {
     if (isEditing) {
       formData.append("superUserRoleId", userRoleData.superUserRoleId);
       console.log(userRoleData.superUserRoleId);
-      
     }
 
     const response = await fetch(apiUrl, {
@@ -341,7 +338,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       inputElement.type = "checkbox";
       inputElement.value = customer.id;
       inputElement.id = customer.id;
-      inputElement.name = customer.module_name;
+      inputElement.name = customer.file_name;
       inputElement.classList.add("form-check-input");
       const labelElement = document.createElement("label");
       labelElement.htmlFor = customer.id;
