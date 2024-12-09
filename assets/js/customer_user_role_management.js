@@ -254,7 +254,7 @@ async function fetchUsers(gridApi) {
       customerId: item.customer_id,
     }));
     console.log({ formattedData });
-    
+
     gridApi.setGridOption("rowData", formattedData);
   } catch (error) {
     console.error("Error fetching customer data:", error);
@@ -324,14 +324,10 @@ const gridOptions = {
       maxWidth: 150,
       suppressAutoSize: true,
       cellRenderer: StatusCellRenderer,
-      cellClassRules: {
-        "disabled-cell": (params) =>
-          params.data.email === localStorage.getItem("userEmail"),
-      },
     },
     {
       headerName: "Action",
-      field: "action",
+      field: "id",
       filter: false,
       sortable: false,
       maxWidth: 150,
@@ -348,10 +344,6 @@ const gridOptions = {
                   <i class="bi bi-pencil-square"></i>
                 </button>`;
       },
-      cellClassRules: {
-        "disabled-cell": (params) =>
-          params.data.email === localStorage.getItem("userEmail"),
-      },
     },
   ],
 
@@ -363,10 +355,6 @@ const gridOptions = {
     filterParams: {
       debounceMs: 0,
       buttons: ["reset"],
-    },
-    cellClassRules: {
-      "disabled-cell": (params) =>
-        params.data.email === localStorage.getItem("userEmail"),
     },
   },
   domLayout: "autoHeight",
