@@ -3,11 +3,11 @@ function loadNavBar() {
     <figure>
       <img src="./assets/images/index/logo.png" alt="logo" />
     </figure>
-    <div class="navItems" id="all_devices_link">
-      <i class="bi bi-pin-map" style="font-size: 20px"></i>
-      <p>All Devices</p>
-    </div>
     <div class="navContent">
+      <div class="navItems" id="all_devices_link">
+        <i class="bi bi-pin-map" style="font-size: 20px"></i>
+        <p>All Devices</p>
+      </div>
       <div class="navItems" id="dashboard_link">
         <i class="bi bi-house-door" style="font-size: 20px"></i>
         <p>Dashboard</p>
@@ -98,57 +98,64 @@ function loadNavBar() {
 
   setActiveLink();
 
-  document.getElementById("logout-link").addEventListener("click", function () {
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("userEmail");
-    localStorage.removeItem("selectedDeviceId");
-    window.location.href = "/login.html";
+  const links = {
+    "logout-link": "/login.html",
+    dashboard_link: "/",
+    dashboard_link: "/index.html",
+    mesha_customer_management_link: "/mesha_customer_management.html",
+    "device_management-link": "/device_management.html",
+    customer_user_role_management_link: "/customer_user_role_management.html",
+    super_user_role_management_link: "/super_user_role_management.html",
+    user_role_definition_link: "/user_role_definition.html",
+    profile_link: "/profile.html",
+    all_devices_link: "/all_devices.html",
+  };
+
+  Object.entries(links).forEach(([id, url]) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.addEventListener("click", () => {
+        if (id === "logout-link") {
+          localStorage.clear();
+        }
+        window.location.href = url;
+      });
+    }
   });
-  document
-    .getElementById("dashboard_link")
-    .addEventListener("click", function () {
-      window.location.href = "/index.html";
-    });
-  document
-    .getElementById("mesha_customer_management_link")
-    .addEventListener("click", function () {
-      window.location.href = "/mesha_customer_management.html";
-    });
-  document
-    .getElementById("device_management-link")
-    .addEventListener("click", function () {
-      window.location.href = "/device_management.html";
-    });
-  document
-    .getElementById("customer_user_role_management_link")
-    .addEventListener("click", function () {
-      window.location.href = "/customer_user_role_management.html";
-    });
-  document
-    .getElementById("super_user_role_management_link")
-    .addEventListener("click", function () {
-      window.location.href = "/super_user_role_management.html";
-    });
-  document
-    .getElementById("user_role_definition_link")
-    .addEventListener("click", function () {
-      window.location.href = "/user_role_definition.html";
-    });
-  document
-    .getElementById("profile_link")
-    .addEventListener("click", function () {
-      window.location.href = "/profile.html";
-    });
-  document
-    .getElementById("all_devices_link")
-    .addEventListener("click", function () {
-      window.location.href = "/all_devices.html";
-    });
+  modulePermission(links);
+}
+const allowedModules = JSON.parse(localStorage.getItem("moduleList")) || [];
+function modulePermission(links) {
+  const currentPageFileName = window.location.pathname.split("/").pop();
+
+  // Check if the current page's file_name exists in the allowed modules
+  const isPageAllowed = allowedModules.some(
+    (module) => module.file_name === currentPageFileName
+  );
+
+  if (!isPageAllowed) {
+    const firstAllowedModule = allowedModules[0];
+    if (firstAllowedModule) {
+      window.location.href = `/${firstAllowedModule.file_name}`;
+    } else {
+      window.location.href = "/login.html";
+    }
+  }
+  Object.entries(links).forEach(([id, url]) => {
+    if (url === "/login.html" || url === "/register.html") return;
+    let isHiddden = allowedModules.some(
+      (module) => module.file_name === url.split("/").pop()
+    );
+    if (!isHiddden) {
+      document.getElementById(id).style.display = "none";
+    }
+  });
 }
 
 function setActiveLink() {
-  const path = window.location.pathname;
+  const allowedModules = JSON.parse(localStorage.getItem("moduleList")) || [];
 
+  const path = window.location.pathname;
   const links = {
     "/": "dashboard_link",
     "/index.html": "dashboard_link",
@@ -177,6 +184,16 @@ function setActiveLink() {
     "/customer_user_role_management.html",
     "/device_management.html",
   ];
+  const isAccordion1Hidden = allowedModules.some(
+    (module) =>
+      module.file_name === "mesha_customer_management.html" ||
+      module.file_name === "customer_user_role_management.html" ||
+      module.file_name === "device_management.html"
+  );
+  if (!isAccordion1Hidden) {
+    const accordionButton = document.querySelector(".accordion_1");
+    accordionButton.style.display = "none";
+  }
   const isAccordionActive = accordionLinks.includes(path);
 
   if (isAccordionActive) {
@@ -192,6 +209,15 @@ function setActiveLink() {
     "/super_user_role_management.html",
     "/user_role_definition.html",
   ];
+  const isAccordion2Hidden = allowedModules.some(
+    (module) =>
+      module.file_name === "super_user_role_management.html" ||
+      module.file_name === "user_role_definition.html"
+  );
+  if (!isAccordion2Hidden) {
+    const accordionButton = document.querySelector(".accordion_2");
+    accordionButton.style.display = "none";
+  }
   const isAccordionActive_2 = accordionLinks_2.includes(path);
 
   if (isAccordionActive_2) {

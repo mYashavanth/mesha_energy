@@ -109,6 +109,7 @@ async function handleSubmit(event) {
     if (data.errFlag === 0) {
       localStorage.setItem("authToken", data.token);
       localStorage.setItem("userEmail", loginData.email);
+      localStorage.setItem("moduleList", JSON.stringify(data.modules));
       window.location.href = "all_devices.html";
     } else {
       inputValidationMsg.textContent = data.message + " Please try again.";

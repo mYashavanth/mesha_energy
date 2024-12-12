@@ -87,6 +87,7 @@ function handleEdit(rowData) {
   const checkboxes = document.querySelectorAll(
     "#userDefinitionModal input[type='checkbox']"
   );
+  console.log({ rowData });
 
   // Check checkboxes that match the module_permitted in rowData
   checkboxes.forEach((checkbox) => {
@@ -268,16 +269,22 @@ const gridOptions = {
       maxWidth: 150,
       suppressAutoSize: true,
       cellRenderer: function (params) {
-        return `<button 
-                  type="button" 
-                  style="margin-top:10px;" 
-                  data-bs-toggle="modal"
-                  data-bs-target="#userDefinitionModal"
-                  class="btn btn-light" 
-                  onclick='handleEdit(${JSON.stringify(params.data)})'
-                >
-                  <i class="bi bi-pencil-square"></i>
-                </button>`;
+        const isDisabled = params.data.user_role_name === "Admin";
+        const buttonHtml = `<button 
+                              type="button" 
+                              style="margin-top: 10px;" 
+                              data-bs-toggle="modal"
+                              data-bs-target="#userDefinitionModal"
+                              class="btn btn-light" 
+                              ${isDisabled ? "disabled" : ""}
+                              onclick='handleEdit(${JSON.stringify(
+                                params.data
+                              )})'
+                            >
+                              <i class="bi bi-pencil-square"></i>
+                            </button>
+                          `;
+        return buttonHtml;
       },
     },
   ],
